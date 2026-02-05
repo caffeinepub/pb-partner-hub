@@ -1,0 +1,47 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "PB Partner Hub logo static asset + consistent usage",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Add a generated transparent 200x200 PB Partner Hub logo PNG as a static asset at the exact filename already referenced by the UI.",
+      "acceptanceCriteria": [
+        "`frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png` exists and is a 200x200 transparent PNG.",
+        "The existing Header and Footer logo renders without broken images and remains crisp at 40x40 display size."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png",
+          "operation": "create",
+          "description": "Create the square 200x200 transparent PNG brand logo for PB Partner Hub (letters 'PB', clean professional insurance/partner-hub feel) at this exact path/filename so existing UI references load correctly."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Ensure the logo is served as a frontend static file and used consistently anywhere the site logo appears (Header/Footer).",
+      "acceptanceCriteria": [
+        "No backend endpoints or blob storage are used to fetch the logo.",
+        "Header and Footer both load the logo from `/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png`."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/constants/brand.ts",
+          "operation": "create",
+          "description": "Add a single shared constant (e.g., exported logo asset path string) for the PB Partner Hub logo pointing to `/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png` to ensure consistent usage across the app."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Update the header logo image source to reference the shared brand logo constant so the logo is consistently loaded as a frontend static file (not via backend) and remains crisp at 40x40."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Update the footer logo image source to reference the shared brand logo constant so the logo is consistently loaded as a frontend static file (not via backend) and matches the header."
+        }
+      ]
+    }
+  ]
+}

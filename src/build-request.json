@@ -1,0 +1,55 @@
+{
+  "kind": "build_request",
+  "title": "Create and add PB Partner Hub logo asset",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Generate a PB Partner Hub brand logo as a transparent PNG suitable for use in the website header/footer (square, clean at small sizes), and add it as a static asset under `frontend/public/assets/generated/` using the exact filename already referenced by the UI: `pb-partner-hub-logo-transparent.dim_200x200.png`.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "PB Partner HUB ka logo please"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png` exists and is a 200x200 transparent PNG.",
+        "The existing Header and Footer logo renders without broken images and remains crisp at 40x40 display size."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Ensure the generated logo asset is served as a frontend static file (do not route the logo through the backend), and confirm it is used consistently anywhere the site logo appears (at minimum: Header and Footer).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-20"
+        ],
+        "quotes": [
+          "PB Partner HUB ka logo please"
+        ]
+      },
+      "acceptanceCriteria": [
+        "No backend endpoints or blob storage are used to fetch the logo.",
+        "Header and Footer both load the logo from `/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png`."
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not edit any files under `frontend/src/components/ui`.",
+    "Do not introduce any new backend canisters or external services."
+  ],
+  "nonGoals": [
+    "Redesigning the site theme or changing existing page layouts.",
+    "Adding authentication, dashboards, or WhatsApp-related changes."
+  ],
+  "imageRequirements": {
+    "required": [
+      "Square brand logo with the letters 'PB' and a clean, professional insurance/partner-hub feel, transparent background (pb-partner-hub-logo-transparent.dim_200x200.png)"
+    ],
+    "edits": []
+  }
+}

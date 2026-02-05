@@ -1,0 +1,47 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-generate-a-pb-partner-hub-brand-logo-as-a-transparent-png-suitable-for-use-in-the-website-header-footer-square-clean-at-small-sizes-and-add-it-as-a-static-asset-under-frontend-public-assets-generated-using-the-exact-filename-already-referenced-by-the-ui-pb-partner-hub-logo-transparent-dim-200x200-png",
+      "featureTitle": "Generate a PB Partner Hub brand logo as a transparent PNG suitable for use in the website header/footer (square, clean at small sizes), and add it as a static asset under `frontend/public/assets/generated/` using the exact filename already referenced by the UI: `pb-partner-hub-logo-transparent.dim_200x200.png`.",
+      "files": [],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-ensure-the-generated-logo-asset-is-served-as-a-frontend-static-file-do-not-route-the-logo-through-the-backend-and-confirm-it-is-used-consistently-anywhere-the-site-logo-appears-at-minimum-header-and-footer",
+      "featureTitle": "Ensure the generated logo asset is served as a frontend static file (do not route the logo through the backend), and confirm it is used consistently anywhere the site logo appears (at minimum: Header and Footer).",
+      "files": [
+        "frontend/src/components/Footer.tsx",
+        "frontend/src/components/Header.tsx",
+        "frontend/src/constants/brand.ts"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

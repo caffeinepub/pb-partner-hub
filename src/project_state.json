@@ -1,0 +1,311 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "PB Partner Hub is a React (TanStack Router) single-page marketing site plus an ICP Motoko backend canister. The frontend provides public pages (Home/About/Services/Partner Onboarding/Contact + legal pages), dynamic client-side SEO metadata and sitemap/robots, and onboarding UX including multi-file document upload. Authenticated admin users (via Internet Identity + RBAC) get dashboards for viewing/exporting contact submissions and for managing/storing WhatsApp conversations, including Meta WhatsApp Cloud API credential management, connection/status checks, phone-number attachment checks via HTTPS outcalls, webhook verification logic with audit logging, and an admin-facing ‘Live deployment check’ panel that calls a public health endpoint.",
+  "existing_features": [
+    {
+      "id": "IF-1",
+      "title": "Public marketing website with multi-page navigation",
+      "synonyms": [
+        "Landing pages",
+        "Public SPA",
+        "Marketing site"
+      ],
+      "description": "Implements a multi-page React SPA (Home, About, Services, Partner Onboarding, Contact, Privacy Policy, Terms of Use, Disclaimer) using TanStack Router, wrapped in a shared Layout with responsive Header/Footer navigation.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-2",
+      "title": "Dynamic SEO metadata + structured data + sitemap/robots",
+      "synonyms": [
+        "SEO tags",
+        "OpenGraph/Twitter meta",
+        "JSON-LD"
+      ],
+      "description": "Provides a reusable SEO component that updates document title, meta description, Open Graph/Twitter tags, canonical URL, and injects Organization JSON-LD. Includes static robots.txt and sitemap.xml for indexing.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-3",
+      "title": "UI system with Tailwind + shadcn-style components and theme support",
+      "synonyms": [
+        "Design system",
+        "Component library",
+        "Styling"
+      ],
+      "description": "Uses TailwindCSS with CSS-variable-based design tokens and shadcn-style UI components (cards, dialogs, tables, badges, etc.). Theme switching is provided via next-themes (class-based dark mode).",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-4",
+      "title": "Internet Identity authentication provider",
+      "synonyms": [
+        "II login",
+        "AuthClient integration",
+        "Delegation persistence"
+      ],
+      "description": "Implements an InternetIdentityProvider React context that initializes AuthClient, restores persisted delegations, supports login/logout, and exposes identity and detailed login status flags to the app.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-5",
+      "title": "Identity-aware backend actor creation and initialization",
+      "synonyms": [
+        "useActor",
+        "Authenticated actor",
+        "Actor caching"
+      ],
+      "description": "Creates an anonymous or authenticated canister actor based on the current Internet Identity. On authenticated actor creation, calls _initializeAccessControlWithSecret using a secret pulled from the URL hash/session to bootstrap RBAC, and invalidates dependent React Query caches when the actor changes.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-6",
+      "title": "Role-based access control (admin/user/guest)",
+      "synonyms": [
+        "RBAC",
+        "Authorization",
+        "Access control"
+      ],
+      "description": "Motoko AccessControl tracks roles per Principal. Initialization assigns admin to a principal providing the correct token (CAFFEINE_ADMIN_TOKEN), otherwise assigns user. Admins can assign roles and check admin status.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-7",
+      "title": "Contact form submission (public) + storage API",
+      "synonyms": [
+        "Lead capture",
+        "Inquiry form",
+        "Contact submission"
+      ],
+      "description": "Frontend Contact page collects name/email/phone/company/message and submits to the backend. Backend stores each submission with a timestamp.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-8",
+      "title": "Admin dashboard for contact submissions (search + CSV export)",
+      "synonyms": [
+        "Lead management",
+        "Contact submissions table"
+      ],
+      "description": "Admin-only dashboard that requires Internet Identity login and admin role, displays contact submissions in a searchable table, shows basic stats, and supports client-side CSV export.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-9",
+      "title": "Partner onboarding page with multi-file drag-and-drop document upload",
+      "synonyms": [
+        "Onboarding uploader",
+        "KYC upload",
+        "Document intake UI"
+      ],
+      "description": "Partner onboarding page lists required documents and provides a unified upload area supporting drag/drop or browse, multi-file selection, per-file DocumentType selection, progress indicators, and toast feedback while uploading to the backend.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-10",
+      "title": "Document typing + blob-based document storage APIs",
+      "synonyms": [
+        "Submitted documents",
+        "Document store",
+        "Onboarding requirements"
+      ],
+      "description": "Backend defines a DocumentType variant and stores SubmittedDocument records including file name, type, timestamp, and blob content. Authenticated users can upload; admins can list all submitted documents. A public endpoint returns onboarding document requirements.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-11",
+      "title": "Office contact data configuration API",
+      "synonyms": [
+        "Contact details config",
+        "Office info API"
+      ],
+      "description": "Backend stores OfficeContactData and provides a public getter plus an admin-only updater to manage address/city/district/state/phone/email.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-12",
+      "title": "FAQ and partner benefits registries",
+      "synonyms": [
+        "Onboarding FAQs",
+        "Benefits management"
+      ],
+      "description": "Backend supports admin-only creation of FAQs and partner benefits and provides public retrieval endpoints for all stored entries.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-13",
+      "title": "User profile storage APIs",
+      "synonyms": [
+        "Profile API",
+        "User details"
+      ],
+      "description": "Backend supports saving and retrieving a UserProfile (name, optional email/phone) for the caller and (admin/owner) querying user profiles by Principal.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-14",
+      "title": "WhatsApp message log storage and admin APIs",
+      "synonyms": [
+        "Message log",
+        "Conversation storage"
+      ],
+      "description": "Backend stores WhatsAppMessage records with status (sent/delivered/read/failed). Admin APIs allow sending (stored locally) and listing all WhatsApp messages for dashboard display.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-15",
+      "title": "Admin WhatsApp messaging dashboard with polling + chat UI",
+      "synonyms": [
+        "WhatsApp dashboard UI",
+        "Messaging console"
+      ],
+      "description": "Admin-only WhatsApp dashboard provides contact extraction/search, conversation view with timestamps and status icons, auto-scroll, periodic refresh (polling), and message composition with Enter-to-send plus a separate button for Meta API sending.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-16",
+      "title": "Meta WhatsApp API credential management (admin)",
+      "synonyms": [
+        "Meta API settings",
+        "WhatsApp integration config"
+      ],
+      "description": "Backend exposes admin-only get/update for MetaApiConfig (access token, WABA ID, phone number ID). Frontend provides a settings dialog and React Query hooks to view/update credentials and to display integration/token status.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-17",
+      "title": "ICP HTTPS outcalls utility (GET/POST) with transform",
+      "synonyms": [
+        "HTTP outcalls",
+        "ic:http_request wrapper"
+      ],
+      "description": "Backend module performs HTTPS GET/POST via ic:aaaaa-aa with explicit cycles budgeting, adds user-agent/idempotency headers, and uses a transform function that strips response headers.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-18",
+      "title": "Meta phone-number attachment status check via Graph API",
+      "synonyms": [
+        "Phone number status",
+        "WABA phone list check"
+      ],
+      "description": "Backend calls the Graph API to check whether at least one WhatsApp phone number is attached to the configured business account and returns basic counts/status info; frontend shows this in an integration checklist panel.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-19",
+      "title": "Webhook verification logic with audit logging and admin stats",
+      "synonyms": [
+        "Meta webhook verification",
+        "Verification logs"
+      ],
+      "description": "Backend implements Meta webhook verification logic (mode/token/challenge) and records attempts into an in-canister log with counters, plus an admin-only endpoint to retrieve aggregated stats and logs.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-20",
+      "title": "Blob storage maintenance and cycle refill utilities",
+      "synonyms": [
+        "Storage mixin",
+        "Blob pruning",
+        "Cashier top-up"
+      ],
+      "description": "Includes blob-storage mixin utilities: fetch/update authorized gateway principals via a cashier canister, list dead blobs (authorized-only), confirm deletions and trigger GC, and allow the cashier principal to top up cycles.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "IF-21",
+      "title": "Admin-facing live deployment check panel (frontend)",
+      "synonyms": [
+        "Backend health check UI",
+        "Live deployment status"
+      ],
+      "description": "WhatsApp dashboard includes a ‘Live Deployment Check’ panel backed by a React Query hook that calls a public GET /api/health endpoint, parses a plain-text response into version/timestamp/status, and supports auto-refresh and manual retry UI.",
+      "reqIds": [],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-a-pb-partner-hub-brand-logo-as-a-transparent-png-suitable-for-use-in-the-website-header-footer-square-clean-at-small-sizes-and-add-it-as-a-static-asset-under-frontend-public-assets-generated-using-the-exact-filename-already-referenced-by-the-ui-pb-partner-hub-logo-transparent-dim-200x200-png",
+      "title": "Generate a PB Partner Hub brand logo as a transparent PNG suitable for use in the website header/footer (square, clean at small sizes), and add it as a static asset under `frontend/public/assets/generated/` using the exact filename already referenced by the UI: `pb-partner-hub-logo-transparent.dim_200x200.png`.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-generated-logo-asset-is-served-as-a-frontend-static-file-do-not-route-the-logo-through-the-backend-and-confirm-it-is-used-consistently-anywhere-the-site-logo-appears-at-minimum-header-and-footer",
+      "title": "Ensure the generated logo asset is served as a frontend static file (do not route the logo through the backend), and confirm it is used consistently anywhere the site logo appears (at minimum: Header and Footer).",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a PB Partner HUB logo for the website branding (usable on header/footer and marketing materials).",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "architectural_notes": [
+    "Frontend uses TanStack Router route tree with a shared Layout (Header/Outlet/Footer) and responsive navigation; admin-only links are shown based on Internet Identity + admin role check.",
+    "Frontend data fetching is organized via @tanstack/react-query hooks (queries/mutations), with cache invalidation and periodic polling for near-real-time WhatsApp message updates.",
+    "Authentication uses DFINITY Internet Identity via @dfinity/auth-client; a React context/provider manages persisted delegations and exposes login state.",
+    "Backend is a Motoko canister with modular composition via mixins (authorization and blob-storage maintenance utilities).",
+    "Role-based access control is implemented in Motoko with admin/user/guest roles; admin bootstrap uses an environment variable token (CAFFEINE_ADMIN_TOKEN) plus a user-provided secret.",
+    "Meta/WhatsApp integration relies on ICP HTTPS outcalls (ic:aaaaa-aa http_request) with explicit cycles budgeting and a response transform that strips headers.",
+    "File uploads are sent as byte arrays from the frontend and stored as blobs in canister state (Storage.ExternalBlob), with document typing via a DocumentType variant."
+  ],
+  "known_issues": [
+    "Meta API credentials are hardcoded in backend/main.mo (access token, WABA ID, phone number ID), which is a security risk and will break when tokens expire; credentials should be stored securely and rotated.",
+    "getWhatsAppTokenStatus() always returns \"Valid\" and does not actually validate token expiry or API access.",
+    "sendWhatsAppMessageViaAPI() builds JSON by string concatenation (no escaping) and the payload schema does not match the Meta WhatsApp Cloud API format (likely to fail or misbehave for quotes/newlines and for real API requests).",
+    "Phone-number attachment check (hasAtLeastOnePhoneNumberAttached) infers success/errors by substring matching in the response rather than parsing JSON; counts are effectively heuristic and can be wrong.",
+    "verifyMetaWebhook is declared as a query method but attempts to mutate state (counters/log map). In Motoko, query calls should be read-only; this should be an update call or redesigned for query safety.",
+    "Webhook verification exists only as a canister method (verifyMetaWebhook); no HTTP interface (http_request routing) is shown in the backend for a public GET /api/webhook endpoint required by Meta.",
+    "Frontend includes a backend health check hook/UI calling GET /api/health, but no corresponding backend HTTP endpoint implementation is present in the provided Motoko code; this may fail at runtime unless implemented elsewhere.",
+    "Contact form submissions are stored in a Map keyed by email; multiple submissions from the same email overwrite prior entries (data loss).",
+    "Submitted documents store full blob content in canister state with no pagination/retention policy; storage can grow unbounded and hit canister memory/cycle limits.",
+    "Frontend suggests a per-file size limit, but the backend does not enforce size/type validation for uploads.",
+    "AccessControl.getUserRole traps for authenticated principals that were never initialized; some permission checks can unexpectedly trap instead of returning a safe default.",
+    "Environment variable name \"CAFFFEINE_STORAGE_CASHIER_PRINCIPAL\" appears misspelled (triple 'F'); misconfiguration could prevent storage cashier integration from working.",
+    "Two global CSS files exist (frontend/src/index.css and frontend/index.css) with different token sets; depending on bundling, this can cause inconsistent styling.",
+    "Legal pages (Privacy Policy / Terms / Disclaimer) include placeholder contact details (e.g., Gurugram address, pbpartnerhub.com emails) that are inconsistent with the Nashik contact details used elsewhere."
+  ],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Square brand logo with the letters 'PB' and a clean, professional insurance/partner-hub feel, transparent background (pb-partner-hub-logo-transparent.dim_200x200.png)",
+  "generatedImages": [
+    {
+      "filename": "pb-partner-hub-logo-transparent.dim_200x200.png",
+      "description": "Square brand logo with the letters 'PB' and a clean, professional insurance/partner-hub feel, transparent background",
+      "targetWidth": 200,
+      "targetHeight": 200
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "PB Partner Hub",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}
