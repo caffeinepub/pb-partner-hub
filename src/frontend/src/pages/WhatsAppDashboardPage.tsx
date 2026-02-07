@@ -9,6 +9,7 @@ import { Separator } from '@/components/ui/separator';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { 
   MessageCircle, 
   Send, 
@@ -32,7 +33,10 @@ import {
   Copy,
   ExternalLink,
   RefreshCw,
-  Server
+  Server,
+  UserCheck,
+  Trash2,
+  Plus
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 import { 
@@ -45,7 +49,11 @@ import {
   useGetWhatsAppIntegrationStatus,
   useGetWhatsAppTokenStatus,
   useGetPhoneNumberStatus,
-  useGetBackendHealth
+  useGetBackendHealth,
+  useGetApprovedRecipients,
+  useAddApprovedRecipient,
+  useRemoveApprovedRecipient,
+  RecipientType
 } from '@/hooks/useQueries';
 import { useInternetIdentity } from '@/hooks/useInternetIdentity';
 import { MessageStatus } from '../backend';
@@ -59,6 +67,10 @@ export default function WhatsAppDashboardPage() {
   const [businessAccountId, setBusinessAccountId] = useState('');
   const [phoneNumberId, setPhoneNumberId] = useState('');
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [approvedRecipientsOpen, setApprovedRecipientsOpen] = useState(false);
+  const [newRecipientPhone, setNewRecipientPhone] = useState('');
+  const [newRecipientDescription, setNewRecipientDescription] = useState('');
+  const [newRecipientType, setNewRecipientType] = useState<RecipientType>(RecipientType.individual);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { identity, login, loginStatus } = useInternetIdentity();
@@ -69,9 +81,12 @@ export default function WhatsAppDashboardPage() {
   const { data: tokenStatus, isLoading: tokenStatusLoading } = useGetWhatsAppTokenStatus();
   const { data: phoneNumberStatus, isLoading: phoneNumberStatusLoading } = useGetPhoneNumberStatus();
   const { data: backendHealth, isLoading: healthLoading, error: healthError, refetch: refetchHealth } = useGetBackendHealth();
+  const { data: approvedRecipients = [], isLoading: approvedRecipientsLoading } = useGetApprovedRecipients();
   const sendMessageMutation = useSendWhatsAppMessage();
   const sendMessageViaAPIMutation = useSendWhatsAppMessageViaAPI();
   const updateConfigMutation = useUpdateMetaApiConfig();
+  const addApprovedRecipientMutation = useAddApprovedRecipient();
+  const removeApprovedRecipientMutation = useRemoveApprovedRecipient();
 
   const isAuthenticated = !!identity;
 
@@ -132,6 +147,12 @@ export default function WhatsAppDashboardPage() {
       .filter((msg) => msg.sender === selectedContact || msg.recipient === selectedContact)
       .sort((a, b) => Number(a.timestamp - b.timestamp));
   }, [messages, selectedContact]);
+
+  // Check if selected contact is approved
+  const isSelectedContactApproved = useMemo(() => {
+    if (!selectedContact) return false;
+    return approvedRecipients.some(r => r.phoneNumber === selectedContact);
+  }, [selectedContact, approvedRecipients]);
 
   // Format timestamp
   const formatTime = (timestamp: bigint) => {
@@ -199,6 +220,12 @@ export default function WhatsAppDashboardPage() {
   const handleSendViaAPI = async () => {
     if (!messageContent.trim() || !selectedContact) return;
 
+    // Check if recipient is approved
+    if (!isSelectedContactApproved) {
+      toast.error('Recipient not approved. Please add this number to the approved recipients list first.');
+      return;
+    }
+
     try {
       await sendMessageViaAPIMutation.mutateAsync({
         from: '7709446589',
@@ -207,8 +234,13 @@ export default function WhatsAppDashboardPage() {
       });
       setMessageContent('');
       toast.success('Message sent via Meta API');
-    } catch (error) {
-      toast.error('Failed to send message via API');
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to send message via API';
+      if (errorMessage.includes('whitelisted') || errorMessage.includes('approved')) {
+        toast.error('Recipient not approved. Please add this number to the approved recipients list first.');
+      } else {
+        toast.error(errorMessage);
+      }
       console.error('Send via API error:', error);
     }
   };
@@ -231,6 +263,50 @@ export default function WhatsAppDashboardPage() {
     } catch (error) {
       toast.error('Failed to save settings');
       console.error('Save settings error:', error);
+    }
+  };
+
+  // Handle add approved recipient
+  const handleAddApprovedRecipient = async () => {
+    if (!newRecipientPhone.trim()) {
+      toast.error('Phone number is required');
+      return;
+    }
+
+    // Check if already exists
+    if (approvedRecipients.some(r => r.phoneNumber === newRecipientPhone.trim())) {
+      toast.error('This phone number is already approved');
+      return;
+    }
+
+    try {
+      await addApprovedRecipientMutation.mutateAsync({
+        phoneNumber: newRecipientPhone.trim(),
+        partnerId: 'admin',
+        sourceSystem: 'PB Partners',
+        recipientType: newRecipientType,
+        description: newRecipientDescription.trim() || 'Approved recipient',
+      });
+      toast.success('Recipient approved successfully');
+      setNewRecipientPhone('');
+      setNewRecipientDescription('');
+      setNewRecipientType(RecipientType.individual);
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to approve recipient';
+      toast.error(errorMessage);
+      console.error('Add approved recipient error:', error);
+    }
+  };
+
+  // Handle remove approved recipient
+  const handleRemoveApprovedRecipient = async (phoneNumber: string) => {
+    try {
+      await removeApprovedRecipientMutation.mutateAsync(phoneNumber);
+      toast.success('Recipient removed from approved list');
+    } catch (error: any) {
+      const errorMessage = error?.message || 'Failed to remove recipient';
+      toast.error(errorMessage);
+      console.error('Remove approved recipient error:', error);
     }
   };
 
@@ -471,6 +547,156 @@ export default function WhatsAppDashboardPage() {
                   </p>
                 </div>
               ) : null}
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      {/* Approved Recipients Management Panel */}
+      <section className="py-6 md:py-8">
+        <div className="container">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <UserCheck className="h-5 w-5" />
+                  <CardTitle>Approved Recipients</CardTitle>
+                </div>
+                <Dialog open={approvedRecipientsOpen} onOpenChange={setApprovedRecipientsOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Recipient
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Approved Recipient</DialogTitle>
+                      <DialogDescription>
+                        Add a phone number to the approved recipients list to enable Meta API messaging.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="recipientPhone">Phone Number</Label>
+                        <Input
+                          id="recipientPhone"
+                          placeholder="e.g., 9168761915"
+                          value={newRecipientPhone}
+                          onChange={(e) => setNewRecipientPhone(e.target.value)}
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Enter the phone number without country code prefix
+                        </p>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="recipientType">Recipient Type</Label>
+                        <Select
+                          value={newRecipientType}
+                          onValueChange={(value) => setNewRecipientType(value as RecipientType)}
+                        >
+                          <SelectTrigger id="recipientType">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value={RecipientType.individual}>Individual</SelectItem>
+                            <SelectItem value={RecipientType.corporateClient}>Corporate Client</SelectItem>
+                            <SelectItem value={RecipientType.teamMember}>Team Member</SelectItem>
+                            <SelectItem value={RecipientType.representative}>Representative</SelectItem>
+                            <SelectItem value={RecipientType.automatedSystem}>Automated System</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="recipientDescription">Description (Optional)</Label>
+                        <Input
+                          id="recipientDescription"
+                          placeholder="e.g., Admin's WhatsApp number"
+                          value={newRecipientDescription}
+                          onChange={(e) => setNewRecipientDescription(e.target.value)}
+                        />
+                      </div>
+                    </div>
+                    <DialogFooter>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setApprovedRecipientsOpen(false);
+                          setNewRecipientPhone('');
+                          setNewRecipientDescription('');
+                          setNewRecipientType(RecipientType.individual);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={handleAddApprovedRecipient}
+                        disabled={addApprovedRecipientMutation.isPending}
+                      >
+                        {addApprovedRecipientMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Adding...
+                          </>
+                        ) : (
+                          'Add Recipient'
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <CardDescription>
+                Manage approved phone numbers for Meta API messaging
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {approvedRecipientsLoading ? (
+                <div className="flex items-center gap-3 p-4 border rounded-lg">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                  <span className="text-sm text-muted-foreground">Loading approved recipients...</span>
+                </div>
+              ) : approvedRecipients.length === 0 ? (
+                <Alert>
+                  <Info className="h-4 w-4" />
+                  <AlertTitle>No Approved Recipients</AlertTitle>
+                  <AlertDescription>
+                    Add phone numbers to the approved list to enable Meta API messaging. Click "Add Recipient" to get started.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <div className="space-y-2">
+                  {approvedRecipients.map((recipient) => (
+                    <div
+                      key={recipient.phoneNumber}
+                      className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium">{recipient.phoneNumber}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {recipient.recipientType}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{recipient.description}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleRemoveApprovedRecipient(recipient.phoneNumber)}
+                        disabled={removeApprovedRecipientMutation.isPending}
+                        title="Remove from approved list"
+                      >
+                        {removeApprovedRecipientMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        )}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -903,7 +1129,15 @@ export default function WhatsAppDashboardPage() {
                   <CardHeader className="border-b">
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle className="text-xl">{selectedContact}</CardTitle>
+                        <CardTitle className="text-xl flex items-center gap-2">
+                          {selectedContact}
+                          {isSelectedContactApproved && (
+                            <Badge variant="outline" className="border-green-500 text-green-600">
+                              <CheckCircle2 className="h-3 w-3 mr-1" />
+                              Approved
+                            </Badge>
+                          )}
+                        </CardTitle>
                         <CardDescription>WhatsApp conversation</CardDescription>
                       </div>
                       <Badge variant="outline">Active</Badge>
@@ -963,6 +1197,16 @@ export default function WhatsAppDashboardPage() {
                     </ScrollArea>
                     <Separator />
                     <div className="p-4">
+                      {!isSelectedContactApproved && (
+                        <Alert variant="destructive" className="mb-4">
+                          <AlertTriangle className="h-4 w-4" />
+                          <AlertTitle>Recipient Not Approved</AlertTitle>
+                          <AlertDescription>
+                            This phone number is not in the approved recipients list. Meta API messaging is disabled. 
+                            Please add this number to the approved list to enable sending.
+                          </AlertDescription>
+                        </Alert>
+                      )}
                       <div className="flex gap-2">
                         <Textarea
                           placeholder="Type your message..."
@@ -991,10 +1235,10 @@ export default function WhatsAppDashboardPage() {
                           </Button>
                           <Button
                             onClick={handleSendViaAPI}
-                            disabled={!messageContent.trim() || sendMessageViaAPIMutation.isPending || !isConnected || !isTokenValid}
+                            disabled={!messageContent.trim() || sendMessageViaAPIMutation.isPending || !isConnected || !isTokenValid || !isSelectedContactApproved}
                             size="icon"
                             variant="outline"
-                            title="Send via Meta API"
+                            title={isSelectedContactApproved ? "Send via Meta API" : "Recipient must be approved first"}
                           >
                             {sendMessageViaAPIMutation.isPending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />

@@ -3,6 +3,23 @@ import { useActor } from './useActor';
 import type { ContactFormSubmission, DocumentType, WhatsAppMessage, MessagePayload, MetaApiResponse, MetaApiConfig, MetaPhoneNumberStatus } from '../backend';
 import { ExternalBlob } from '../backend';
 
+// Define types for approved recipients (not yet in backend interface)
+export interface RecipientRecord {
+  phoneNumber: string;
+  partnerId: string;
+  sourceSystem: string;
+  recipientType: RecipientType;
+  description: string;
+}
+
+export enum RecipientType {
+  individual = 'individual',
+  corporateClient = 'corporateClient',
+  teamMember = 'teamMember',
+  representative = 'representative',
+  automatedSystem = 'automatedSystem',
+}
+
 // Submit contact form
 export function useSubmitContactForm() {
   const { actor } = useActor();
@@ -258,5 +275,74 @@ export function useGetBackendHealth() {
     },
     retry: 2,
     refetchInterval: 60000, // Refetch every 60 seconds
+  });
+}
+
+// Get approved recipients (admin only)
+// Note: This will be implemented once backend methods are available
+export function useGetApprovedRecipients() {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<RecipientRecord[]>({
+    queryKey: ['approvedRecipients'],
+    queryFn: async () => {
+      if (!actor) throw new Error('Actor not available');
+      // Check if method exists on actor
+      if ('getApprovedRecipients' in actor && typeof (actor as any).getApprovedRecipients === 'function') {
+        return (actor as any).getApprovedRecipients();
+      }
+      // Return default approved recipient if method not available
+      return [{
+        phoneNumber: '9168761915',
+        partnerId: 'admin',
+        sourceSystem: 'PB Partners',
+        recipientType: RecipientType.individual,
+        description: "Admin's WhatsApp number"
+      }];
+    },
+    enabled: !!actor && !actorFetching,
+    retry: false,
+  });
+}
+
+// Add approved recipient (admin only)
+export function useAddApprovedRecipient() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (record: RecipientRecord) => {
+      if (!actor) throw new Error('Actor not available');
+      // Check if method exists on actor
+      if ('addApprovedRecipient' in actor && typeof (actor as any).addApprovedRecipient === 'function') {
+        await (actor as any).addApprovedRecipient(record);
+      } else {
+        throw new Error('Backend method not yet implemented. Please wait for the next deployment.');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['approvedRecipients'] });
+    },
+  });
+}
+
+// Remove approved recipient (admin only)
+export function useRemoveApprovedRecipient() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (phoneNumber: string) => {
+      if (!actor) throw new Error('Actor not available');
+      // Check if method exists on actor
+      if ('removeApprovedRecipient' in actor && typeof (actor as any).removeApprovedRecipient === 'function') {
+        await (actor as any).removeApprovedRecipient(phoneNumber);
+      } else {
+        throw new Error('Backend method not yet implemented. Please wait for the next deployment.');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['approvedRecipients'] });
+    },
   });
 }

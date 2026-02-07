@@ -1,45 +1,51 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "PB Partner Hub logo static asset + consistent usage",
+  "title": "WhatsApp dashboard: approved recipient number management + client-side send blocking",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Add a generated transparent 200x200 PB Partner Hub logo PNG as a static asset at the exact filename already referenced by the UI.",
+      "id": "REQ-2",
+      "summary": "Add an admin UI in WhatsAppDashboardPage to view/add/remove approved WhatsApp recipient numbers (including approving 9168761915).",
       "acceptanceCriteria": [
-        "`frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png` exists and is a 200x200 transparent PNG.",
-        "The existing Header and Footer logo renders without broken images and remains crisp at 40x40 display size."
+        "In WhatsAppDashboardPage, an admin can add \"9168761915\" to the approved recipient list from the UI and see a success confirmation in English.",
+        "The approved list is visible to admins and updates immediately after add/remove without requiring a full page refresh.",
+        "An admin can remove an approved number from the list via the UI and see the list update accordingly."
       ],
       "file_operations": [
         {
-          "path": "frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png",
-          "operation": "create",
-          "description": "Create the square 200x200 transparent PNG brand logo for PB Partner Hub (letters 'PB', clean professional insurance/partner-hub feel) at this exact path/filename so existing UI references load correctly."
+          "path": "frontend/src/backend.d.ts",
+          "operation": "modify",
+          "description": "Extend the typed backend interface to include the new admin-only approved-recipient-number capabilities (list/add/remove) so the frontend can call them safely."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add React Query hooks for approved WhatsApp recipient number management: fetch approved list, add number, remove number; ensure mutations invalidate/refetch the approved list query for immediate UI updates. (Uses core-infrastructure actor plumbing; Verify the component's usage instructions before implementing.)"
+        },
+        {
+          "path": "frontend/src/pages/WhatsAppDashboardPage.tsx",
+          "operation": "modify",
+          "description": "Add an \"Approved Recipients\" management section for admins: render the current approved list, provide an input to approve a new phone number (allow approving 9168761915), and add remove actions; show English success/error toasts; keep the list in sync via the new React Query hooks. (Uses shadcn-ui components already in the page; Verify the component's usage instructions before implementing.)"
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Ensure the logo is served as a frontend static file and used consistently anywhere the site logo appears (Header/Footer).",
+      "id": "REQ-3",
+      "summary": "Block Meta API sends in the dashboard unless the selected recipient is approved; show an English error message when blocked and handle backend rejection gracefully.",
       "acceptanceCriteria": [
-        "No backend endpoints or blob storage are used to fetch the logo.",
-        "Header and Footer both load the logo from `/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png`."
+        "When attempting to send via Meta API to a recipient that is not approved, the backend rejects the request and the frontend shows an English error toast/message (no message is stored as delivered).",
+        "When the recipient is approved (e.g., 9168761915), the Meta API send action proceeds (subject to existing connection/token checks) and the frontend shows the existing success toast on success."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/constants/brand.ts",
-          "operation": "create",
-          "description": "Add a single shared constant (e.g., exported logo asset path string) for the PB Partner Hub logo pointing to `/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png` to ensure consistent usage across the app."
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Ensure the approved-recipient hooks expose enough state (approved list + loading/error) for the send flow to check approval before attempting the Meta API mutation; keep query keys consistent so invalidation updates send-blocking logic immediately. (Uses core-infrastructure actor plumbing; Verify the component's usage instructions before implementing.)"
         },
         {
-          "path": "frontend/src/components/Header.tsx",
+          "path": "frontend/src/pages/WhatsAppDashboardPage.tsx",
           "operation": "modify",
-          "description": "Update the header logo image source to reference the shared brand logo constant so the logo is consistently loaded as a frontend static file (not via backend) and remains crisp at 40x40."
-        },
-        {
-          "path": "frontend/src/components/Footer.tsx",
-          "operation": "modify",
-          "description": "Update the footer logo image source to reference the shared brand logo constant so the logo is consistently loaded as a frontend static file (not via backend) and matches the header."
+          "description": "Update the Meta API send handler to enforce approved-recipient checks: if selectedContact is not in the approved list, do not call the send mutation and show an English error telling the admin to approve the number first; additionally, if the backend rejects the send due to approval/authorization, surface an English error toast/message and do not clear the message input."
         }
       ]
     }

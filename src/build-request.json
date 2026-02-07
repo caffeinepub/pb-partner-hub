@@ -1,55 +1,74 @@
 {
   "kind": "build_request",
-  "title": "Create and add PB Partner Hub logo asset",
+  "title": "Add admin approval list for WhatsApp recipient numbers (approve 9168761915)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Generate a PB Partner Hub brand logo as a transparent PNG suitable for use in the website header/footer (square, clean at small sizes), and add it as a static asset under `frontend/public/assets/generated/` using the exact filename already referenced by the UI: `pb-partner-hub-logo-transparent.dim_200x200.png`.",
-      "target": "frontend",
+      "text": "Add backend support for an admin-managed list of approved WhatsApp recipient phone numbers, and store the phone number \"9168761915\" as an approved number.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-20"
+          "msg-1"
         ],
         "quotes": [
-          "PB Partner HUB ka logo please"
+          "WhatsApp API approve 9168761915"
         ]
       },
       "acceptanceCriteria": [
-        "`frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png` exists and is a 200x200 transparent PNG.",
-        "The existing Header and Footer logo renders without broken images and remains crisp at 40x40 display size."
+        "Backend exposes admin-only methods to: (1) list approved recipient numbers, (2) add an approved recipient number, and (3) remove an approved recipient number.",
+        "Non-admin callers cannot read or modify the approved recipient number list (must trap/deny).",
+        "After adding \"9168761915\", it appears in the returned approved recipient list."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Ensure the generated logo asset is served as a frontend static file (do not route the logo through the backend), and confirm it is used consistently anywhere the site logo appears (at minimum: Header and Footer).",
+      "text": "Update the WhatsApp admin dashboard UI to manage approved recipient numbers: show the current approved list, provide an input to approve a new phone number, and allow removing an approved number.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-20"
+          "msg-1"
         ],
         "quotes": [
-          "PB Partner HUB ka logo please"
+          "WhatsApp API approve 9168761915"
         ]
       },
       "acceptanceCriteria": [
-        "No backend endpoints or blob storage are used to fetch the logo.",
-        "Header and Footer both load the logo from `/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png`."
+        "In WhatsAppDashboardPage, an admin can add \"9168761915\" to the approved recipient list from the UI and see a success confirmation in English.",
+        "The approved list is visible to admins and updates immediately after add/remove without requiring a full page refresh.",
+        "An admin can remove an approved number from the list via the UI and see the list update accordingly."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Enforce approved-number checking when sending a WhatsApp message via the Meta API from the dashboard: if the selected recipient is not in the approved list, block the send and show an English error message telling the admin to approve the number first.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "WhatsApp API approve 9168761915"
+        ]
+      },
+      "acceptanceCriteria": [
+        "When attempting to send via Meta API to a recipient that is not approved, the backend rejects the request and the frontend shows an English error toast/message (no message is stored as delivered).",
+        "When the recipient is approved (e.g., 9168761915), the Meta API send action proceeds (subject to existing connection/token checks) and the frontend shows the existing success toast on success."
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under `frontend/src/components/ui`.",
-    "Do not introduce any new backend canisters or external services."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit frontend files under frontend/src/components/ui or any other immutablePaths listed in SYSTEM_CONTEXT.",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Redesigning the site theme or changing existing page layouts.",
-    "Adding authentication, dashboards, or WhatsApp-related changes."
+    "Implementing third-party WhatsApp providers (e.g., Interakt) or adding new external integrations beyond the existing Meta API approach.",
+    "Implementing inbound WhatsApp webhook message receiving/processing.",
+    "Building real-time messaging (WebSockets/push)."
   ],
   "imageRequirements": {
-    "required": [
-      "Square brand logo with the letters 'PB' and a clean, professional insurance/partner-hub feel, transparent background (pb-partner-hub-logo-transparent.dim_200x200.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

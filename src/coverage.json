@@ -1,53 +1,63 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T10:27:49.582Z",
+  "generatedAt": "2026-02-05T17:36:25.659Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
+    "total": 3,
     "implemented": 2,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Generate a PB Partner Hub brand logo as a transparent PNG suitable for use in the website header/footer (square, clean at small sizes), and add it as a static asset under `frontend/public/assets/generated/` using the exact filename already referenced by the UI: `pb-partner-hub-logo-transparent.dim_200x200.png`.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png"
-        ],
-        "matchedFiles": [
-          "frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png"
-        ]
+        "summary": "Add backend support for an admin-managed list of approved WhatsApp recipient phone numbers, and store the phone number \"9168761915\" as an approved number.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Ensure the generated logo asset is served as a frontend static file (do not route the logo through the backend), and confirm it is used consistently anywhere the site logo appears (at minimum: Header and Footer).",
+        "summary": "Update the WhatsApp admin dashboard UI to manage approved recipient numbers: show the current approved list, provide an input to approve a new phone number, and allow removing an approved number.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/constants/brand.ts",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/backend.d.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/WhatsAppDashboardPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/constants/brand.ts",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/backend.d.ts",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/WhatsAppDashboardPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Enforce approved-number checking when sending a WhatsApp message via the Meta API from the dashboard: if the selected recipient is not in the approved list, block the send and show an English error message telling the admin to approve the number first.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/WhatsAppDashboardPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/WhatsAppDashboardPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/constants/brand.ts",
+    "frontend/src/backend.d.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/WhatsAppDashboardPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

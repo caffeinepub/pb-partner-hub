@@ -1,7 +1,7 @@
-import Map "mo:core/Map";
-import Text "mo:core/Text";
 import Iter "mo:core/Iter";
 import Time "mo:core/Time";
+import Map "mo:core/Map";
+import Text "mo:core/Text";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
@@ -9,7 +9,9 @@ import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import OutCall "http-outcalls/outcall";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -29,16 +31,8 @@ actor {
     apiStatusCode : Nat;
   };
 
-  var metaApiConfig : ?MetaApiConfig = ?{
-    accessToken = "EAA8W8UrRtQsBQl1L9ZBuUwplzMuQqt00MEsMznDN2mLAK6G7FdcqfMxGZCi7FJvWWqldQ9EiAp7Mn69GarNcsD9R28loA8ggPwAZBTyoRmmzXyAU8p6koZBEhqeSQZBxObZBphQgUEJCXnsOUQGx13ZBUTLsFFenaDAxpKiXYrtQSZAVu1tn8XtQTkVhmQiQgkWqGm0WFfw8Mpvi10KYzGTY4z6ZBdJLjIffv2RzFkGjnuwyKOyz3fvwcC0859ILcNxExUEZAhiK8FZBOKE1xqCVeGaV73T58BE1dVCAwZDZD";
-    whatsappBusinessAccountId = "1631977771136695";
-    phoneNumberId = "958574407341345";
-  };
-
   public shared ({ caller }) func getMetaApiConfig() : async MetaApiConfig {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can access Meta API config");
-    };
+    assertAdmin(caller);
     switch (metaApiConfig) {
       case (null) { Runtime.trap("Meta API config missing") };
       case (?config) { config };
@@ -46,48 +40,35 @@ actor {
   };
 
   public shared ({ caller }) func updateMetaApiConfig(config : MetaApiConfig) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can update Meta API config");
-    };
+    assertAdmin(caller);
     metaApiConfig := ?config;
   };
 
   public shared ({ caller }) func hasAtLeastOnePhoneNumberAttached() : async MetaPhoneNumberStatus {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admins can check phone number status");
-    };
-
+    assertAdmin(caller);
     switch (metaApiConfig) {
       case (null) { Runtime.trap("Meta API config missing") };
       case (?metaApiConfig) {
         let url = "https://graph.facebook.com/v15.0/" # metaApiConfig.whatsappBusinessAccountId # "/message_whatsapp_phone_numbers";
-
         let headers : [OutCall.Header] = [
           { name = "Authorization"; value = "Bearer " # metaApiConfig.accessToken },
         ];
-
         let response = await OutCall.httpGetRequest(url, headers, transform);
         let jsonString = response;
-
         let responseCode = if (jsonString.contains(#text "[]")) { 200 } else {
           if (jsonString.contains(#text "error")) { 403 } else { 500 };
         };
-
         let (totalNumbers, testNumbers, productionNumbers) = if (responseCode != 200) {
           (0, 0, 0);
         } else {
           let isTest = jsonString.contains(#text "test_number");
           let isActive = jsonString.contains(#text "ACTIVE");
-
           let testCount = if (isTest) { 1 } else { 0 };
           let productionCount = if (isActive) { 1 } else { 0 };
           let totalCount = testCount + productionCount;
-
           (totalCount, testCount, productionCount);
         };
-
         let hasNumbers = totalNumbers > 0;
-
         {
           totalNumbers;
           testNumbers;
@@ -108,23 +89,17 @@ actor {
   let userProfiles = Map.empty<Principal, UserProfile>();
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can access profiles");
-    };
+    assertUser(caller);
     userProfiles.get(caller);
   };
 
   public query ({ caller }) func getUserProfile(user : Principal) : async ?UserProfile {
-    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Can only view your own profile");
-    };
+    assertUserOrSelf(user, caller);
     userProfiles.get(user);
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can save profile");
-    };
+    assertUser(caller);
     userProfiles.add(caller, profile);
   };
 
@@ -270,14 +245,11 @@ actor {
       message;
       timestamp = Time.now();
     };
-
     contactFormSubmissions.add(email, submission);
   };
 
   public query ({ caller }) func getAllContactFormSubmissions() : async [ContactFormSubmission] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view contact form submissions");
-    };
+    assertAdmin(caller);
     contactFormSubmissions.values().toArray();
   };
 
@@ -286,12 +258,8 @@ actor {
     fileName : Text,
     fileContent : Storage.ExternalBlob,
   ) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can upload documents");
-    };
-
+    assertUser(caller);
     let documentId = fileName.concat(Time.now().toText());
-
     let document : SubmittedDocument = {
       id = documentId;
       docType;
@@ -299,21 +267,16 @@ actor {
       uploadedAt = Time.now();
       fileContent;
     };
-
     submittedDocuments.add(documentId, document);
   };
 
   public query ({ caller }) func getAllSubmittedDocuments() : async [SubmittedDocument] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view submitted documents");
-    };
+    assertAdmin(caller);
     submittedDocuments.values().toArray();
   };
 
   public shared ({ caller }) func updateOfficeContactData(data : OfficeContactData) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can update contact data");
-    };
+    assertAdmin(caller);
     contactFormData := data;
   };
 
@@ -322,9 +285,7 @@ actor {
   };
 
   public shared ({ caller }) func addFAQ(id : Text, question : Text, answer : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add FAQs");
-    };
+    assertAdmin(caller);
     onboardingFaqs.add(id, { question; answer });
   };
 
@@ -333,9 +294,7 @@ actor {
   };
 
   public shared ({ caller }) func addPartnerBenefit(id : Text, title : Text, description : Text) : async () {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can add partner benefits");
-    };
+    assertAdmin(caller);
     partnerBenefits.add(id, { title; description });
   };
 
@@ -359,9 +318,9 @@ actor {
   };
 
   public shared ({ caller }) func sendWhatsAppMessageViaAPI(payload : MessagePayload) : async MetaApiResponse {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admin users can send WhatsApp messages");
-    };
+    assertAdmin(caller);
+    assertRecipientApproved(payload.to);
+
     switch (metaApiConfig) {
       case (null) { Runtime.trap("Meta API config missing") };
       case (?config) {
@@ -370,15 +329,13 @@ actor {
           { name = "Authorization"; value = "Bearer " # config.accessToken },
           { name = "Content-Type"; value = "application/json" },
         ];
-
         let requestBody = "{
-        \"from\": \"" # payload.from # "\",
-        \"to\": \"" # payload.to # "\",
-        \"content\": \"" # payload.content # "\"
+          \"from\": \"" # payload.from # "\",
+          \"to\": \"" # payload.to # "\",
+          \"content\": \"" # payload.content # "\"
         }";
 
         let _ = await OutCall.httpPostRequest(apiUrl, headers, requestBody, transform);
-
         let metaMessageId = Time.now().toText();
 
         let whatsappMessage : WhatsAppMessage = {
@@ -400,9 +357,7 @@ actor {
   };
 
   public query ({ caller }) func getWhatsAppIntegrationStatus() : async Text {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view WhatsApp integration status");
-    };
+    assertAdmin(caller);
     switch (metaApiConfig) {
       case (null) { "Not Connected" };
       case (?_) { "Connected" };
@@ -410,16 +365,12 @@ actor {
   };
 
   public query ({ caller }) func getWhatsAppTokenStatus() : async Text {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view WhatsApp token status");
-    };
+    assertAdmin(caller);
     "Valid";
   };
 
   public query ({ caller }) func getWhatsAppAccountDetails() : async ?MetaApiConfig {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admins can view WhatsApp account details");
-    };
+    assertAdmin(caller);
     metaApiConfig;
   };
 
@@ -428,9 +379,7 @@ actor {
     recipient : Text,
     content : Text,
   ) : async () {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #admin))) {
-      Runtime.trap("Unauthorized: Only admin users can send WhatsApp messages");
-    };
+    assertAdmin(caller);
     let messageId = sender.concat(recipient).concat(Time.now().toText());
 
     let message : WhatsAppMessage = {
@@ -446,9 +395,7 @@ actor {
   };
 
   public query ({ caller }) func getAllWhatsAppMessages() : async [WhatsAppMessage] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin users can view WhatsApp messages");
-    };
+    assertAdmin(caller);
     whatsappMessages.values().toArray();
   };
 
@@ -485,7 +432,6 @@ actor {
   ) : async WebhookVerificationOutcome {
     let timestamp = Time.now();
     let logId = timestamp.toNat();
-
     let verificationResult = switch (request.mode, Text.equal(request.verifyToken, "pbpartnershub")) {
       case ("subscribe", true) {
         successfulVerifications += 1;
@@ -541,10 +487,7 @@ actor {
   };
 
   public query ({ caller }) func getWebhookVerificationStats() : async ?WebhookVerificationStats {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin users can retrieve webhook verification stats");
-    };
-
+    assertAdmin(caller);
     let logsArray = metaWebhookVerificationLogs.values().toArray();
     let mappedLogs = logsArray.map(
       func(log) {
@@ -555,12 +498,68 @@ actor {
         };
       }
     );
-
     ?{
       successful = successfulVerifications;
       failed = failedVerifications;
       modeMismatched = modeMismatchedVerifications;
       logs = mappedLogs;
     };
+  };
+
+  // New: Approved recipients list and constants for admin check
+  public type RecipientRecord = {
+    phoneNumber : Text;
+    partnerId : Text;
+    sourceSystem : Text;
+    recipientType : RecipientType;
+    description : Text;
+  };
+
+  public type RecipientType = {
+    #individual;
+    #corporateClient;
+    #teamMember;
+    #representative;
+    #automatedSystem;
+  };
+
+  let approvedRecipients = Map.empty<Text, RecipientRecord>();
+
+  func isRecipientInApprovedList(phoneNumber : Text) : Bool {
+    approvedRecipients.containsKey(phoneNumber);
+  };
+
+  func assertRecipientApproved(phoneNumber : Text) {
+    if (not isRecipientInApprovedList(phoneNumber)) {
+      Runtime.trap("Not whitelisted. WhatsApp message cannot be sent. Please add the recipient to the approved list first.");
+    };
+  };
+
+  // Admin helper function for authentication check
+  func assertAdmin(caller : Principal) {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admins can perform this action");
+    };
+  };
+
+  // User helper function for authentication check
+  func assertUser(caller : Principal) {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only users can perform this action");
+    };
+  };
+
+  // User or self helper function for authentication check
+  func assertUserOrSelf(user : Principal, caller : Principal) {
+    if (caller != user and not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Can only view your own profile");
+    };
+  };
+
+  // Store the initial approved recipient and meta API config.
+  var metaApiConfig : ?MetaApiConfig = ?{
+    accessToken = "EAA8W8UrRtQsBQl1L9ZBuUwplzMuQqt00MEsMznDN2mLAK6G7FdcqfMxGZCi7FJvWWqldQ9EiAp7Mn69GarNcsD9R28loA8ggPwAZBTyoRmmzXyAU8p6koZBEhqeSQZBxObZBphQgUEJCXnsOUQGx13ZBUTLsFFenaDAxpKiXYrtQSZAVu1tn8XtQTkVhmQiQgkWqGm0WFfw8Mpvi10KYzGTY4z6ZBdJLjIffv2RzFkGjnuwyKOyz3fvwcC0859ILcNxExUEZAhiK8FZBOKE1xqCVeGaV73T58BE1dVCAwZDZD";
+    whatsappBusinessAccountId = "1631977771136695";
+    phoneNumberId = "958574407341345";
   };
 };

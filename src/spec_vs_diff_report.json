@@ -1,37 +1,61 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-04T10:27:49.557Z",
-  "summary": "Header and Footer were updated to reference a centralized BRAND logo path (/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png), but the actual required PNG asset file is not shown as added in the diff summary. Additionally, WhatsApp-related UI content/links appear to have been added/expanded, which is explicitly a non-goal.",
+  "generatedAt": "2026-02-05T17:36:25.657Z",
+  "summary": "Diff adds a backend migration that seeds an approved recipient (9168761915) and introduces frontend types/hooks/UI wiring for approved-recipient management, but the diff evidence does not show the required backend admin-only CRUD methods nor backend enforcement of approved-recipient checks on Meta API sends. It also adds a 5-second polling “real-time updates” behavior that is explicitly a non-goal.",
   "missing_requirements": [
     {
       "id": "REQ-1",
-      "requirement": "Generate a PB Partner Hub brand logo as a transparent PNG (200x200) and add it under frontend/public/assets/generated/ using the exact filename pb-partner-hub-logo-transparent.dim_200x200.png.",
-      "reason": "The diff summary does not show the required PNG asset being added under frontend/public/assets/generated/. Only code references to the path were added/updated.",
+      "requirement": "Backend exposes admin-only methods to (1) list approved recipient numbers, (2) add an approved recipient number, and (3) remove an approved recipient number; non-admin callers must be denied; 9168761915 must appear after adding.",
+      "reason": "While a migration seeds `approvedRecipients` with 9168761915, the diff summary for `backend/main.mo` is truncated and does not show any new public admin-only methods for listing/adding/removing approved recipients, nor the non-admin denial behavior for these methods.",
       "evidence": [
-        "frontend/src/constants/brand.ts",
-        "frontend/src/components/Header.tsx",
-        "frontend/src/components/Footer.tsx"
+        "backend/migration.mo",
+        "backend/main.mo (truncated; no shown approved-recipient methods)"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "requirement": "WhatsAppDashboardPage UI lets an admin view approved list, add a new phone number (e.g., 9168761915) with an English success confirmation, and remove numbers with immediate list update (no full refresh).",
+      "reason": "`WhatsAppDashboardPage.tsx` imports and references hooks for approved recipients, but the provided diff is truncated before showing the actual UI rendering, add/remove handlers, and success/error toasts/messages in English.",
+      "evidence": [
+        "frontend/src/pages/WhatsAppDashboardPage.tsx (truncated)",
+        "frontend/src/hooks/useQueries.ts (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "requirement": "Enforce approved-number checking when sending a WhatsApp message via the Meta API: backend rejects unapproved recipients and frontend shows an English error telling admin to approve first; approved recipients proceed with existing success behavior.",
+      "reason": "No backend send-path logic is shown that checks the recipient against an approved list and rejects if not approved. Frontend enforcement/error toast behavior is also not evidenced in the truncated dashboard/page and hooks snippets.",
+      "evidence": [
+        "backend/main.mo (truncated; no shown approved-recipient enforcement on send)",
+        "frontend/src/pages/WhatsAppDashboardPage.tsx (truncated)",
+        "frontend/src/hooks/useQueries.ts (truncated)"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Added/expanded WhatsApp-related UI elements (WhatsApp link in Footer contact info and WhatsApp navigation link for admins in Header).",
-      "reason": "BuildRequest explicitly lists WhatsApp-related changes as a non-goal, but the diff includes WhatsApp contact links and navigation.",
+      "description": "Real-time-ish WhatsApp message polling every 5 seconds via React Query `refetchInterval: 5000`.",
+      "reason": "BuildRequest explicitly lists building real-time messaging as a non-goal; adding periodic polling to approximate real-time updates is an unrequested behavior change.",
       "evidence": [
-        "frontend/src/components/Footer.tsx",
-        "frontend/src/components/Header.tsx",
-        "frontend-file-summaries.txt"
+        "frontend/src/hooks/useQueries.ts"
+      ]
+    },
+    {
+      "description": "Frontend fallback behavior that 'gracefully handle[s] missing backend methods' for approved recipients and uses a default approved recipient (9168761915).",
+      "reason": "REQ-1 requires backend support and admin-only methods; implementing frontend fallbacks for missing backend methods is not requested and suggests the backend interface may not actually provide the required methods.",
+      "evidence": [
+        "frontend-file-summaries.txt (entry for frontend/src/hooks/useQueries.ts)"
       ]
     }
   ],
-  "confidence": 0.78,
+  "confidence": 0.68,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Footer.tsx",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/constants/brand.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/WhatsAppDashboardPage.tsx",
     "project_state.json"
   ]
 }

@@ -133,6 +133,13 @@ export interface UserProfile {
     email?: string;
     phone?: string;
 }
+export interface RecipientRecord {
+    phoneNumber: string;
+    partnerId: string;
+    sourceSystem: string;
+    recipientType: RecipientType;
+    description: string;
+}
 export enum DocumentType {
     bankDetails = "bankDetails",
     mobileNumber = "mobileNumber",
@@ -152,6 +159,13 @@ export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
+}
+export enum RecipientType {
+    individual = "individual",
+    corporateClient = "corporateClient",
+    teamMember = "teamMember",
+    representative = "representative",
+    automatedSystem = "automatedSystem"
 }
 export interface backendInterface {
     addFAQ(id: string, question: string, answer: string): Promise<void>;
@@ -183,4 +197,7 @@ export interface backendInterface {
     updateOfficeContactData(data: OfficeContactData): Promise<void>;
     uploadDocument(docType: DocumentType, fileName: string, fileContent: ExternalBlob): Promise<void>;
     verifyMetaWebhook(request: MetaWebhookVerificationRequest): Promise<WebhookVerificationOutcome>;
+    getApprovedRecipients(): Promise<Array<RecipientRecord>>;
+    addApprovedRecipient(record: RecipientRecord): Promise<void>;
+    removeApprovedRecipient(phoneNumber: string): Promise<void>;
 }

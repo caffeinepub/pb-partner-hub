@@ -2,31 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-generate-a-pb-partner-hub-brand-logo-as-a-transparent-png-suitable-for-use-in-the-website-header-footer-square-clean-at-small-sizes-and-add-it-as-a-static-asset-under-frontend-public-assets-generated-using-the-exact-filename-already-referenced-by-the-ui-pb-partner-hub-logo-transparent-dim-200x200-png",
-      "featureTitle": "Generate a PB Partner Hub brand logo as a transparent PNG suitable for use in the website header/footer (square, clean at small sizes), and add it as a static asset under `frontend/public/assets/generated/` using the exact filename already referenced by the UI: `pb-partner-hub-logo-transparent.dim_200x200.png`.",
-      "files": [],
-      "components": [
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "http-outcalls@3.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-the-generated-logo-asset-is-served-as-a-frontend-static-file-do-not-route-the-logo-through-the-backend-and-confirm-it-is-used-consistently-anywhere-the-site-logo-appears-at-minimum-header-and-footer",
-      "featureTitle": "Ensure the generated logo asset is served as a frontend static file (do not route the logo through the backend), and confirm it is used consistently anywhere the site logo appears (at minimum: Header and Footer).",
+      "featureId": "feature-update-the-whatsapp-admin-dashboard-ui-to-manage-approved-recipient-numbers-show-the-current-approved-list-provide-an-input-to-approve-a-new-phone-number-and-allow-removing-an-approved-number",
+      "featureTitle": "Update the WhatsApp admin dashboard UI to manage approved recipient numbers: show the current approved list, provide an input to approve a new phone number, and allow removing an approved number.",
       "files": [
-        "frontend/src/components/Footer.tsx",
-        "frontend/src/components/Header.tsx",
-        "frontend/src/constants/brand.ts"
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/WhatsAppDashboardPage.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -40,6 +20,28 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-enforce-approved-number-checking-when-sending-a-whatsapp-message-via-the-meta-api-from-the-dashboard-if-the-selected-recipient-is-not-in-the-approved-list-block-the-send-and-show-an-english-error-message-telling-the-admin-to-approve-the-number-first",
+      "featureTitle": "Enforce approved-number checking when sending a WhatsApp message via the Meta API from the dashboard: if the selected recipient is not in the approved list, block the send and show an English error message telling the admin to approve the number first.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/WhatsAppDashboardPage.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }
