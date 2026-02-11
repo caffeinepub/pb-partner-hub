@@ -3,14 +3,19 @@ import { ThemeProvider } from 'next-themes';
 import Layout from './components/Layout';
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
-import ServicesPage from './pages/ServicesPage';
-import PartnerOnboardingPage from './pages/PartnerOnboardingPage';
+import PartnerSupportPage from './pages/PartnerSupportPage';
+import InsuranceServicesPage from './pages/InsuranceServicesPage';
 import ContactPage from './pages/ContactPage';
+import PartnerOnboardingPage from './pages/PartnerOnboardingPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import WhatsAppDashboardPage from './pages/WhatsAppDashboardPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import TermsOfUsePage from './pages/TermsOfUsePage';
 import DisclaimerPage from './pages/DisclaimerPage';
+import Page2Page from './pages/Page2Page';
+import Page3Page from './pages/Page3Page';
+import Page4Page from './pages/Page4Page';
+import Page5Page from './pages/Page5Page';
 
 const rootRoute = createRootRoute({
   component: Layout,
@@ -28,22 +33,37 @@ const aboutRoute = createRoute({
   component: AboutPage,
 });
 
+const partnerSupportRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/partner-support',
+  component: PartnerSupportPage,
+});
+
+const insuranceServicesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/insurance-services',
+  component: InsuranceServicesPage,
+});
+
 const servicesRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/services',
-  component: ServicesPage,
-});
-
-const onboardingRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/partner-onboarding',
-  component: PartnerOnboardingPage,
+  component: () => {
+    window.location.href = '/insurance-services';
+    return null;
+  },
 });
 
 const contactRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/contact',
   component: ContactPage,
+});
+
+const onboardingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/partner-onboarding',
+  component: PartnerOnboardingPage,
 });
 
 const adminRoute = createRoute({
@@ -76,17 +96,47 @@ const disclaimerRoute = createRoute({
   component: DisclaimerPage,
 });
 
+const page2Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/page-2',
+  component: Page2Page,
+});
+
+const page3Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/page-3',
+  component: Page3Page,
+});
+
+const page4Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/page-4',
+  component: Page4Page,
+});
+
+const page5Route = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/page-5',
+  component: Page5Page,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   aboutRoute,
+  partnerSupportRoute,
+  insuranceServicesRoute,
   servicesRoute,
-  onboardingRoute,
   contactRoute,
+  onboardingRoute,
   adminRoute,
   whatsappRoute,
   privacyRoute,
   termsRoute,
   disclaimerRoute,
+  page2Route,
+  page3Route,
+  page4Route,
+  page5Route,
 ]);
 
 const router = createRouter({ routeTree });

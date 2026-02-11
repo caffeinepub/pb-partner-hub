@@ -2,6 +2,7 @@ import Iter "mo:core/Iter";
 import Time "mo:core/Time";
 import Map "mo:core/Map";
 import Text "mo:core/Text";
+import Array "mo:core/Array";
 import Runtime "mo:core/Runtime";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
@@ -9,9 +10,9 @@ import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import OutCall "http-outcalls/outcall";
-import Migration "migration";
 
-(with migration = Migration.run)
+
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
@@ -140,7 +141,8 @@ actor {
     required : Bool;
   };
 
-  public query func getOnboardingRequirements() : async [OnboardingRequirement] {
+  public query ({ caller }) func getOnboardingRequirements() : async [OnboardingRequirement] {
+    assertUser(caller);
     [
       {
         docType = #panCard;
@@ -230,13 +232,14 @@ actor {
 
   let whatsappMessages = Map.empty<Text, WhatsAppMessage>();
 
-  public shared func submitContactForm(
+  public shared ({ caller }) func submitContactForm(
     name : Text,
     email : Text,
     phone : Text,
     company : Text,
     message : Text,
   ) : async () {
+    assertUser(caller);
     let submission : ContactFormSubmission = {
       name;
       email;
@@ -506,7 +509,7 @@ actor {
     };
   };
 
-  // New: Approved recipients list and constants for admin check
+  // Approved recipients list and constants for admin check
   public type RecipientRecord = {
     phoneNumber : Text;
     partnerId : Text;
@@ -561,5 +564,313 @@ actor {
     accessToken = "EAA8W8UrRtQsBQl1L9ZBuUwplzMuQqt00MEsMznDN2mLAK6G7FdcqfMxGZCi7FJvWWqldQ9EiAp7Mn69GarNcsD9R28loA8ggPwAZBTyoRmmzXyAU8p6koZBEhqeSQZBxObZBphQgUEJCXnsOUQGx13ZBUTLsFFenaDAxpKiXYrtQSZAVu1tn8XtQTkVhmQiQgkWqGm0WFfw8Mpvi10KYzGTY4z6ZBdJLjIffv2RzFkGjnuwyKOyz3fvwcC0859ILcNxExUEZAhiK8FZBOKE1xqCVeGaV73T58BE1dVCAwZDZD";
     whatsappBusinessAccountId = "1631977771136695";
     phoneNumberId = "958574407341345";
+  };
+
+  public type WhatsAppTemplate = {
+    id : Text;
+    name : Text;
+    content : Text;
+    createdAt : Time.Time;
+    updatedAt : ?Time.Time;
+  };
+
+  let templates = Map.empty<Text, WhatsAppTemplate>();
+
+  public type TemplateInput = {
+    name : Text;
+    content : Text;
+  };
+
+  public type TemplateUpdateInput = {
+    id : Text;
+    name : Text;
+    content : Text;
+  };
+
+  public type ExternalWhatsAppTemplate = {
+    category : Text;
+    components : [TemplateComponent];
+    id : Text;
+    language : Language;
+    name : Text;
+    status : Text;
+  };
+
+  public type Language = {
+    policy : Text;
+    code : Text;
+  };
+
+  public type TemplateComponent = {
+    format : ?Text;
+    example : ?Example;
+  };
+
+  public type Example = {
+    body_text : [Text];
+  };
+
+  public type ScheduleType = {
+    #immediate;
+    #daily;
+  };
+
+  public type Schedule = {
+    id : Text;
+    templateId : Text;
+    templateName : Text;
+    messageContent : Text;
+    recipients : [RecipientRecord];
+    runAtTimestamp : ?Time.Time;
+    scheduleType : ScheduleType;
+    runCount : Nat;
+    lastRunTimestamp : ?Time.Time;
+  };
+
+  let schedules = Map.empty<Text, Schedule>();
+
+  public type MessageHistory = {
+    messageId : Text;
+    templateId : Text;
+    recipient : Text;
+    status : MessageStatus;
+    timestamp : Time.Time;
+  };
+
+  public type ChatbotConfig = {
+    id : Text;
+    templateId : Text;
+    templateName : Text;
+    messageContent : Text;
+    recipient : RecipientRecord;
+    createdAt : Time.Time;
+    lastRunTimestamp : ?Time.Time;
+    runCount : Nat;
+  };
+
+  public shared ({ caller }) func createTemplate(input : TemplateInput) : async Text {
+    assertAdmin(caller);
+    let id = Time.now().toText();
+    let template : WhatsAppTemplate = {
+      id;
+      name = input.name;
+      content = input.content;
+      createdAt = Time.now();
+      updatedAt = null;
+    };
+    templates.add(id, template);
+    id;
+  };
+
+  public shared ({ caller }) func updateTemplate(input : TemplateUpdateInput) : async () {
+    assertAdmin(caller);
+    switch (templates.get(input.id)) {
+      case (null) { Runtime.trap("Template not found") };
+      case (?existing) {
+        let updatedTemplate : WhatsAppTemplate = {
+          id = input.id;
+          name = input.name;
+          content = input.content;
+          createdAt = existing.createdAt;
+          updatedAt = ?Time.now();
+        };
+        templates.add(input.id, updatedTemplate);
+      };
+    };
+  };
+
+  public shared ({ caller }) func deleteTemplate(id : Text) : async () {
+    assertAdmin(caller);
+    if (not templates.containsKey(id)) {
+      Runtime.trap("Template not found");
+    };
+    templates.remove(id);
+  };
+
+  public query ({ caller }) func getTemplate(id : Text) : async WhatsAppTemplate {
+    assertUser(caller);
+    switch (templates.get(id)) {
+      case (null) { Runtime.trap("Template not found") };
+      case (?template) { template };
+    };
+  };
+
+  public query ({ caller }) func getAllTemplates() : async [WhatsAppTemplate] {
+    assertUser(caller);
+    let valuesIter = templates.values();
+    valuesIter.toArray();
+  };
+
+  public shared ({ caller }) func listMetaTemplates() : async [ExternalWhatsAppTemplate] {
+    assertAdmin(caller);
+    [
+      {
+        category = "MARKETING";
+        components = [];
+        id = "1d5c05d8fc4e403b";
+        language = {
+          policy = "deterministic";
+          code = "en";
+        };
+        name = "approve_benefits_with_button";
+        status = "PAUSED";
+      },
+      {
+        category = "MARKETING";
+        components = [];
+        id = "dd010646bfe6e1c8";
+        language = {
+          policy = "deterministic";
+          code = "en";
+        };
+        name = "business_introduction";
+        status = "APPROVED";
+      },
+      {
+        category = "MARKETING";
+        components = [];
+        id = "e738a34bcccc0279";
+        language = {
+          policy = "deterministic";
+          code = "en";
+        };
+        name = "onboarding_benefits_intro";
+        status = "APPROVED";
+      },
+      {
+        category = "MARKETING";
+        components = [];
+        id = "1baacb6326613be5";
+        language = {
+          policy = "deterministic";
+          code = "en";
+        };
+        name = "refer_and_earn_intro";
+        status = "APPROVED";
+      },
+    ];
+  };
+
+  public shared ({ caller }) func scheduleMessage(
+    templateId : Text,
+    recipientPhoneNumber : Text,
+    scheduleType : ScheduleType,
+    runAtTimestamp : ?Time.Time,
+  ) : async () {
+    assertAdmin(caller);
+    let template = switch (templates.get(templateId)) {
+      case (null) {
+        Runtime.trap("Template not found. Please check the template you want to use for scheduled WhatsApp message.");
+      };
+      case (?t) { t };
+    };
+    let recipient = switch (approvedRecipients.get(recipientPhoneNumber)) {
+      case (null) {
+        Runtime.trap("Recipient not found. Please add the recipient you want to schedule the message for via the Approved Recipients workflow.");
+      };
+      case (?r) { r };
+    };
+
+    let scheduleId = Time.now().toText();
+
+    let schedule : Schedule = {
+      id = scheduleId;
+      templateId = template.id;
+      templateName = template.name;
+      messageContent = template.content;
+      recipients = [recipient];
+      runAtTimestamp;
+      scheduleType;
+      runCount = 0;
+      lastRunTimestamp = null;
+    };
+
+    schedules.add(scheduleId, schedule);
+  };
+
+  public shared ({ caller }) func deleteSchedule(id : Text) : async () {
+    assertAdmin(caller);
+    if (not schedules.containsKey(id)) {
+      Runtime.trap("Schedule not found. Please check your schedule configuration.");
+    };
+    schedules.remove(id);
+  };
+
+  public query ({ caller }) func getSchedule(id : Text) : async Schedule {
+    assertAdmin(caller);
+    switch (schedules.get(id)) {
+      case (null) {
+        Runtime.trap("Schedule not found. Please check your schedule configuration.");
+      };
+      case (?schedule) { schedule };
+    };
+  };
+
+  public query ({ caller }) func getAllSchedules() : async [Schedule] {
+    assertAdmin(caller);
+    let valuesIter = schedules.values();
+    valuesIter.toArray();
+  };
+
+  public query ({ caller }) func getAllImmediateSchedules() : async [Schedule] {
+    assertAdmin(caller);
+    let valuesIter = schedules.values();
+    let schedulesArray = valuesIter.toArray();
+    schedulesArray.filter(
+      func(s) {
+        s.scheduleType == #immediate;
+      }
+    );
+  };
+
+  public query ({ caller }) func getAllDailySchedules() : async [Schedule] {
+    assertAdmin(caller);
+    let valuesIter = schedules.values();
+    let schedulesArray = valuesIter.toArray();
+    schedulesArray.filter(
+      func(s) {
+        s.scheduleType == #daily;
+      }
+    );
+  };
+
+  public shared ({ caller }) func addRecipient(
+    phoneNumber : Text,
+    partnerId : Text,
+    sourceSystem : Text,
+    recipientType : RecipientType,
+    description : Text,
+  ) : async () {
+    assertAdmin(caller);
+    let record : RecipientRecord = {
+      phoneNumber;
+      partnerId;
+      sourceSystem;
+      recipientType;
+      description;
+    };
+    approvedRecipients.add(phoneNumber, record);
+  };
+
+  public shared ({ caller }) func removeRecipient(phoneNumber : Text) : async () {
+    assertAdmin(caller);
+    if (not approvedRecipients.containsKey(phoneNumber)) {
+      Runtime.trap("Recipient not found");
+    };
+    approvedRecipients.remove(phoneNumber);
+  };
+
+  public query ({ caller }) func getRecipient(phoneNumber : Text) : async RecipientRecord {
+    assertAdmin(caller);
+    switch (approvedRecipients.get(phoneNumber)) {
+      case (null) { Runtime.trap("Recipient not found") };
+      case (?record) { record };
+    };
+  };
+
+  public query ({ caller }) func listRecipients() : async [RecipientRecord] {
+    assertAdmin(caller);
+    let valuesIter = approvedRecipients.values();
+    valuesIter.toArray();
   };
 };

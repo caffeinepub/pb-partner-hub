@@ -10,9 +10,13 @@ import { BRAND } from '@/constants/brand';
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'About Us', href: '/about' },
-  { name: 'Services', href: '/services' },
-  { name: 'Partner Onboarding', href: '/partner-onboarding' },
-  { name: 'Contact', href: '/contact' },
+  { name: 'Partner Support', href: '/partner-support' },
+  { name: 'Insurance Services', href: '/insurance-services' },
+  { name: 'Contact Us', href: '/contact' },
+  { name: 'Page 2', href: '/page-2' },
+  { name: 'Page 3', href: '/page-3' },
+  { name: 'Page 4', href: '/page-4' },
+  { name: 'Page 5', href: '/page-5' },
 ];
 
 export default function Header() {
@@ -31,6 +35,8 @@ export default function Header() {
           <img
             src={BRAND.logo.path}
             alt={BRAND.logo.alt}
+            width={BRAND.logo.displaySize.width}
+            height={BRAND.logo.displaySize.height}
             className="h-10 w-10"
           />
           <span className="text-xl font-bold text-primary">{BRAND.name}</span>

@@ -1,37 +1,15 @@
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, TrendingUp, ArrowRight, CheckCircle } from 'lucide-react';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 import SEO from '@/components/SEO';
 
-const features = [
-  {
-    icon: Users,
-    title: 'Partner Onboarding',
-    description:
-      'Streamlined onboarding process to help insurance partners get started quickly and efficiently.',
-  },
-  {
-    icon: FileText,
-    title: 'Document Support',
-    description:
-      'Comprehensive documentation assistance and support for all your insurance partnership needs.',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Business Development',
-    description:
-      'Strategic business development programs designed to help partners grow and succeed.',
-  },
-];
-
-const benefits = [
-  'Simplified onboarding process',
-  'Expert guidance and support',
-  'Comprehensive training programs',
-  'Dedicated account management',
-  'Regular business updates',
-  'Growth-focused strategies',
+const highlights = [
+  'Dedicated Partner Support',
+  'Policybazaar & PB Partners Assistance',
+  'Documentation & Process Help',
+  'Fast Query Resolution',
+  'Growth-Focused Partner Model',
 ];
 
 export default function HomePage() {
@@ -39,7 +17,7 @@ export default function HomePage() {
     <>
       <SEO
         title="Home"
-        description="PB Partner Hub - Supporting PBPartners by helping insurance partners with onboarding, document support, and business development."
+        description="PB Partners Hub – Trusted Insurance Partner Support Platform. We support Policybazaar and PB Partners with reliable insurance guidance, partner assistance, and long-term growth opportunities."
         canonical="/"
       />
 
@@ -50,61 +28,61 @@ export default function HomePage() {
             <div className="space-y-8">
               <div className="space-y-4">
                 <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl text-foreground">
-                  Empowering Insurance Partners for{' '}
-                  <span className="text-primary">Success</span>
+                  PB Partners Hub – Trusted Insurance Partner Support Platform
                 </h1>
                 <p className="text-lg text-muted-foreground md:text-xl max-w-2xl">
-                  PB Partner Hub supports PBPartners (Policybazaar Insurance Broker Pvt. Ltd.) by
-                  providing comprehensive onboarding, documentation, and business development
-                  services.
+                  We support Policybazaar and PB Partners with reliable insurance guidance, partner
+                  assistance, and long-term growth opportunities.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link to="/partner-onboarding">
                   <Button size="lg" className="w-full sm:w-auto">
-                    Get Started
+                    Become a Partner
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                 </Link>
-                <Link to="/services">
+                <Link to="/partner-support">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                    Explore Services
+                    Explore Support
                   </Button>
                 </Link>
               </div>
             </div>
             <div className="relative">
-              <img
-                src="/assets/generated/office-building.dim_800x600.jpg"
-                alt="Modern office building"
-                className="rounded-lg shadow-2xl"
-              />
+              <div className="aspect-[16/9] overflow-hidden rounded-lg shadow-2xl">
+                <img
+                  src="/assets/generated/pb-partners-hub-hero-illustration.dim_1600x900.png"
+                  alt="Professional insurance partner support illustration showing collaboration between partners and support team with documents and digital tools"
+                  className="w-full h-full object-cover"
+                  width={1600}
+                  height={900}
+                />
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* What We Do Section */}
       <section className="py-20 md:py-28">
         <div className="container">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              Our Core Services
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive solutions designed to support insurance partners at every stage of
-              their journey.
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">What We Do</h2>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              PB Partners Hub is dedicated to supporting insurance partners with end-to-end
+              assistance, documentation help, training support, and smooth coordination for faster
+              business growth.
             </p>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {features.map((feature) => (
-              <Card key={feature.title} className="border-2 hover:border-primary/50 transition-colors">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
+            {highlights.map((highlight) => (
+              <Card key={highlight} className="border-2 hover:border-primary/50 transition-colors">
                 <CardHeader>
-                  <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                    <feature.icon className="h-6 w-6 text-primary" />
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-6 w-6 text-primary mt-0.5 flex-shrink-0" />
+                    <CardTitle className="text-lg">{highlight}</CardTitle>
                   </div>
-                  <CardTitle className="text-xl">{feature.title}</CardTitle>
-                  <CardDescription className="text-base">{feature.description}</CardDescription>
                 </CardHeader>
               </Card>
             ))}
@@ -112,80 +90,31 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* CTA Section */}
       <section className="py-20 md:py-28 bg-muted/30">
         <div className="container">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
-            <div>
-              <img
-                src="/assets/generated/team-meeting.dim_800x600.jpg"
-                alt="Team collaboration meeting"
-                className="rounded-lg shadow-xl"
-              />
-            </div>
-            <div className="space-y-6">
-              <div>
-                <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-                  Why Partner With Us?
-                </h2>
-                <p className="text-lg text-muted-foreground">
-                  We provide end-to-end support to ensure your success as an insurance partner with
-                  PBPartners.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {benefits.map((benefit) => (
-                  <div key={benefit} className="flex items-start gap-3">
-                    <CheckCircle className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <span className="text-sm font-medium">{benefit}</span>
-                  </div>
-                ))}
-              </div>
-              <Link to="/about">
-                <Button variant="outline" size="lg" className="mt-4">
-                  Learn More About Us
+          <div className="max-w-3xl mx-auto text-center space-y-8">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Ready to Grow Your Insurance Business?
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Join PB Partners Hub today and get the support you need to succeed as an insurance
+              partner.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/partner-onboarding">
+                <Button size="lg" className="w-full sm:w-auto">
+                  Become a Partner
                   <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  Contact Us
                 </Button>
               </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 md:py-28">
-        <div className="container">
-          <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground border-0">
-            <CardContent className="p-12 text-center">
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-                Ready to Get Started?
-              </h2>
-              <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Join our network of successful insurance partners and take your business to the next
-                level with PB Partner Hub.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link to="/partner-onboarding">
-                  <Button
-                    size="lg"
-                    variant="secondary"
-                    className="w-full sm:w-auto bg-background text-foreground hover:bg-background/90"
-                  >
-                    Start Onboarding
-                  </Button>
-                </Link>
-                <Link to="/contact">
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    className="w-full sm:w-auto border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10"
-                  >
-                    Contact Us
-                  </Button>
-                </Link>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </section>
     </>

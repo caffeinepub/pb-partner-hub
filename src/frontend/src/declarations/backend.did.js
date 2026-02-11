@@ -19,10 +19,21 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
+export const RecipientType = IDL.Variant({
+  'individual' : IDL.Null,
+  'automatedSystem' : IDL.Null,
+  'corporateClient' : IDL.Null,
+  'representative' : IDL.Null,
+  'teamMember' : IDL.Null,
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
+});
+export const TemplateInput = IDL.Record({
+  'content' : IDL.Text,
+  'name' : IDL.Text,
 });
 export const Time = IDL.Int;
 export const ContactFormSubmission = IDL.Record({
@@ -32,6 +43,28 @@ export const ContactFormSubmission = IDL.Record({
   'message' : IDL.Text,
   'timestamp' : Time,
   'phone' : IDL.Text,
+});
+export const RecipientRecord = IDL.Record({
+  'description' : IDL.Text,
+  'partnerId' : IDL.Text,
+  'phoneNumber' : IDL.Text,
+  'recipientType' : RecipientType,
+  'sourceSystem' : IDL.Text,
+});
+export const ScheduleType = IDL.Variant({
+  'immediate' : IDL.Null,
+  'daily' : IDL.Null,
+});
+export const Schedule = IDL.Record({
+  'id' : IDL.Text,
+  'messageContent' : IDL.Text,
+  'templateId' : IDL.Text,
+  'runCount' : IDL.Nat,
+  'lastRunTimestamp' : IDL.Opt(Time),
+  'templateName' : IDL.Text,
+  'recipients' : IDL.Vec(RecipientRecord),
+  'scheduleType' : ScheduleType,
+  'runAtTimestamp' : IDL.Opt(Time),
 });
 export const FAQ = IDL.Record({ 'question' : IDL.Text, 'answer' : IDL.Text });
 export const PartnerBenefit = IDL.Record({
@@ -54,6 +87,13 @@ export const SubmittedDocument = IDL.Record({
   'fileContent' : ExternalBlob,
   'docType' : DocumentType,
   'uploadedAt' : Time,
+});
+export const WhatsAppTemplate = IDL.Record({
+  'id' : IDL.Text,
+  'content' : IDL.Text,
+  'name' : IDL.Text,
+  'createdAt' : Time,
+  'updatedAt' : IDL.Opt(Time),
 });
 export const MessageStatus = IDL.Variant({
   'read' : IDL.Null,
@@ -119,6 +159,20 @@ export const MetaPhoneNumberStatus = IDL.Record({
   'apiStatusCode' : IDL.Nat,
   'productionNumbers' : IDL.Nat,
 });
+export const Example = IDL.Record({ 'body_text' : IDL.Vec(IDL.Text) });
+export const TemplateComponent = IDL.Record({
+  'example' : IDL.Opt(Example),
+  'format' : IDL.Opt(IDL.Text),
+});
+export const Language = IDL.Record({ 'code' : IDL.Text, 'policy' : IDL.Text });
+export const ExternalWhatsAppTemplate = IDL.Record({
+  'id' : IDL.Text,
+  'status' : IDL.Text,
+  'name' : IDL.Text,
+  'components' : IDL.Vec(TemplateComponent),
+  'language' : Language,
+  'category' : IDL.Text,
+});
 export const MessagePayload = IDL.Record({
   'to' : IDL.Text,
   'content' : IDL.Text,
@@ -145,6 +199,11 @@ export const TransformationOutput = IDL.Record({
   'status' : IDL.Nat,
   'body' : IDL.Vec(IDL.Nat8),
   'headers' : IDL.Vec(http_header),
+});
+export const TemplateUpdateInput = IDL.Record({
+  'id' : IDL.Text,
+  'content' : IDL.Text,
+  'name' : IDL.Text,
 });
 export const WebhookVerificationOutcome = IDL.Variant({
   'modeMismatch' : IDL.Null,
@@ -182,19 +241,31 @@ export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'addFAQ' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   'addPartnerBenefit' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+  'addRecipient' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, RecipientType, IDL.Text],
+      [],
+      [],
+    ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'createTemplate' : IDL.Func([TemplateInput], [IDL.Text], []),
+  'deleteSchedule' : IDL.Func([IDL.Text], [], []),
+  'deleteTemplate' : IDL.Func([IDL.Text], [], []),
   'getAllContactFormSubmissions' : IDL.Func(
       [],
       [IDL.Vec(ContactFormSubmission)],
       ['query'],
     ),
+  'getAllDailySchedules' : IDL.Func([], [IDL.Vec(Schedule)], ['query']),
   'getAllFAQs' : IDL.Func([], [IDL.Vec(FAQ)], ['query']),
+  'getAllImmediateSchedules' : IDL.Func([], [IDL.Vec(Schedule)], ['query']),
   'getAllPartnerBenefits' : IDL.Func([], [IDL.Vec(PartnerBenefit)], ['query']),
+  'getAllSchedules' : IDL.Func([], [IDL.Vec(Schedule)], ['query']),
   'getAllSubmittedDocuments' : IDL.Func(
       [],
       [IDL.Vec(SubmittedDocument)],
       ['query'],
     ),
+  'getAllTemplates' : IDL.Func([], [IDL.Vec(WhatsAppTemplate)], ['query']),
   'getAllWhatsAppMessages' : IDL.Func(
       [],
       [IDL.Vec(WhatsAppMessage)],
@@ -209,6 +280,9 @@ export const idlService = IDL.Service({
       [IDL.Vec(OnboardingRequirement)],
       ['query'],
     ),
+  'getRecipient' : IDL.Func([IDL.Text], [RecipientRecord], ['query']),
+  'getSchedule' : IDL.Func([IDL.Text], [Schedule], ['query']),
+  'getTemplate' : IDL.Func([IDL.Text], [WhatsAppTemplate], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -232,7 +306,15 @@ export const idlService = IDL.Service({
       [],
     ),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'listMetaTemplates' : IDL.Func([], [IDL.Vec(ExternalWhatsAppTemplate)], []),
+  'listRecipients' : IDL.Func([], [IDL.Vec(RecipientRecord)], ['query']),
+  'removeRecipient' : IDL.Func([IDL.Text], [], []),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+  'scheduleMessage' : IDL.Func(
+      [IDL.Text, IDL.Text, ScheduleType, IDL.Opt(Time)],
+      [],
+      [],
+    ),
   'sendWhatsAppMessage' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
   'sendWhatsAppMessageViaAPI' : IDL.Func(
       [MessagePayload],
@@ -251,6 +333,7 @@ export const idlService = IDL.Service({
     ),
   'updateMetaApiConfig' : IDL.Func([MetaApiConfig], [], []),
   'updateOfficeContactData' : IDL.Func([OfficeContactData], [], []),
+  'updateTemplate' : IDL.Func([TemplateUpdateInput], [], []),
   'uploadDocument' : IDL.Func([DocumentType, IDL.Text, ExternalBlob], [], []),
   'verifyMetaWebhook' : IDL.Func(
       [MetaWebhookVerificationRequest],
@@ -273,11 +356,19 @@ export const idlFactory = ({ IDL }) => {
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
   });
+  const RecipientType = IDL.Variant({
+    'individual' : IDL.Null,
+    'automatedSystem' : IDL.Null,
+    'corporateClient' : IDL.Null,
+    'representative' : IDL.Null,
+    'teamMember' : IDL.Null,
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
+  const TemplateInput = IDL.Record({ 'content' : IDL.Text, 'name' : IDL.Text });
   const Time = IDL.Int;
   const ContactFormSubmission = IDL.Record({
     'name' : IDL.Text,
@@ -286,6 +377,28 @@ export const idlFactory = ({ IDL }) => {
     'message' : IDL.Text,
     'timestamp' : Time,
     'phone' : IDL.Text,
+  });
+  const RecipientRecord = IDL.Record({
+    'description' : IDL.Text,
+    'partnerId' : IDL.Text,
+    'phoneNumber' : IDL.Text,
+    'recipientType' : RecipientType,
+    'sourceSystem' : IDL.Text,
+  });
+  const ScheduleType = IDL.Variant({
+    'immediate' : IDL.Null,
+    'daily' : IDL.Null,
+  });
+  const Schedule = IDL.Record({
+    'id' : IDL.Text,
+    'messageContent' : IDL.Text,
+    'templateId' : IDL.Text,
+    'runCount' : IDL.Nat,
+    'lastRunTimestamp' : IDL.Opt(Time),
+    'templateName' : IDL.Text,
+    'recipients' : IDL.Vec(RecipientRecord),
+    'scheduleType' : ScheduleType,
+    'runAtTimestamp' : IDL.Opt(Time),
   });
   const FAQ = IDL.Record({ 'question' : IDL.Text, 'answer' : IDL.Text });
   const PartnerBenefit = IDL.Record({
@@ -308,6 +421,13 @@ export const idlFactory = ({ IDL }) => {
     'fileContent' : ExternalBlob,
     'docType' : DocumentType,
     'uploadedAt' : Time,
+  });
+  const WhatsAppTemplate = IDL.Record({
+    'id' : IDL.Text,
+    'content' : IDL.Text,
+    'name' : IDL.Text,
+    'createdAt' : Time,
+    'updatedAt' : IDL.Opt(Time),
   });
   const MessageStatus = IDL.Variant({
     'read' : IDL.Null,
@@ -373,6 +493,20 @@ export const idlFactory = ({ IDL }) => {
     'apiStatusCode' : IDL.Nat,
     'productionNumbers' : IDL.Nat,
   });
+  const Example = IDL.Record({ 'body_text' : IDL.Vec(IDL.Text) });
+  const TemplateComponent = IDL.Record({
+    'example' : IDL.Opt(Example),
+    'format' : IDL.Opt(IDL.Text),
+  });
+  const Language = IDL.Record({ 'code' : IDL.Text, 'policy' : IDL.Text });
+  const ExternalWhatsAppTemplate = IDL.Record({
+    'id' : IDL.Text,
+    'status' : IDL.Text,
+    'name' : IDL.Text,
+    'components' : IDL.Vec(TemplateComponent),
+    'language' : Language,
+    'category' : IDL.Text,
+  });
   const MessagePayload = IDL.Record({
     'to' : IDL.Text,
     'content' : IDL.Text,
@@ -396,6 +530,11 @@ export const idlFactory = ({ IDL }) => {
     'status' : IDL.Nat,
     'body' : IDL.Vec(IDL.Nat8),
     'headers' : IDL.Vec(http_header),
+  });
+  const TemplateUpdateInput = IDL.Record({
+    'id' : IDL.Text,
+    'content' : IDL.Text,
+    'name' : IDL.Text,
   });
   const WebhookVerificationOutcome = IDL.Variant({
     'modeMismatch' : IDL.Null,
@@ -433,23 +572,35 @@ export const idlFactory = ({ IDL }) => {
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'addFAQ' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'addPartnerBenefit' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
+    'addRecipient' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, RecipientType, IDL.Text],
+        [],
+        [],
+      ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'createTemplate' : IDL.Func([TemplateInput], [IDL.Text], []),
+    'deleteSchedule' : IDL.Func([IDL.Text], [], []),
+    'deleteTemplate' : IDL.Func([IDL.Text], [], []),
     'getAllContactFormSubmissions' : IDL.Func(
         [],
         [IDL.Vec(ContactFormSubmission)],
         ['query'],
       ),
+    'getAllDailySchedules' : IDL.Func([], [IDL.Vec(Schedule)], ['query']),
     'getAllFAQs' : IDL.Func([], [IDL.Vec(FAQ)], ['query']),
+    'getAllImmediateSchedules' : IDL.Func([], [IDL.Vec(Schedule)], ['query']),
     'getAllPartnerBenefits' : IDL.Func(
         [],
         [IDL.Vec(PartnerBenefit)],
         ['query'],
       ),
+    'getAllSchedules' : IDL.Func([], [IDL.Vec(Schedule)], ['query']),
     'getAllSubmittedDocuments' : IDL.Func(
         [],
         [IDL.Vec(SubmittedDocument)],
         ['query'],
       ),
+    'getAllTemplates' : IDL.Func([], [IDL.Vec(WhatsAppTemplate)], ['query']),
     'getAllWhatsAppMessages' : IDL.Func(
         [],
         [IDL.Vec(WhatsAppMessage)],
@@ -464,6 +615,9 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(OnboardingRequirement)],
         ['query'],
       ),
+    'getRecipient' : IDL.Func([IDL.Text], [RecipientRecord], ['query']),
+    'getSchedule' : IDL.Func([IDL.Text], [Schedule], ['query']),
+    'getTemplate' : IDL.Func([IDL.Text], [WhatsAppTemplate], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -487,7 +641,15 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'listMetaTemplates' : IDL.Func([], [IDL.Vec(ExternalWhatsAppTemplate)], []),
+    'listRecipients' : IDL.Func([], [IDL.Vec(RecipientRecord)], ['query']),
+    'removeRecipient' : IDL.Func([IDL.Text], [], []),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
+    'scheduleMessage' : IDL.Func(
+        [IDL.Text, IDL.Text, ScheduleType, IDL.Opt(Time)],
+        [],
+        [],
+      ),
     'sendWhatsAppMessage' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [], []),
     'sendWhatsAppMessageViaAPI' : IDL.Func(
         [MessagePayload],
@@ -506,6 +668,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'updateMetaApiConfig' : IDL.Func([MetaApiConfig], [], []),
     'updateOfficeContactData' : IDL.Func([OfficeContactData], [], []),
+    'updateTemplate' : IDL.Func([TemplateUpdateInput], [], []),
     'uploadDocument' : IDL.Func([DocumentType, IDL.Text, ExternalBlob], [], []),
     'verifyMetaWebhook' : IDL.Func(
         [MetaWebhookVerificationRequest],

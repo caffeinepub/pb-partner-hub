@@ -25,8 +25,18 @@ export type DocumentType = { 'bankDetails' : null } |
   { 'panCard' : null } |
   { 'aadhaarCard' : null } |
   { 'educationCertificate' : null };
+export interface Example { 'body_text' : Array<string> }
 export type ExternalBlob = Uint8Array;
+export interface ExternalWhatsAppTemplate {
+  'id' : string,
+  'status' : string,
+  'name' : string,
+  'components' : Array<TemplateComponent>,
+  'language' : Language,
+  'category' : string,
+}
 export interface FAQ { 'question' : string, 'answer' : string }
+export interface Language { 'code' : string, 'policy' : string }
 export interface MessagePayload {
   'to' : string,
   'content' : string,
@@ -75,12 +85,47 @@ export interface OnboardingRequirement {
   'docType' : DocumentType,
 }
 export interface PartnerBenefit { 'title' : string, 'description' : string }
+export interface RecipientRecord {
+  'description' : string,
+  'partnerId' : string,
+  'phoneNumber' : string,
+  'recipientType' : RecipientType,
+  'sourceSystem' : string,
+}
+export type RecipientType = { 'individual' : null } |
+  { 'automatedSystem' : null } |
+  { 'corporateClient' : null } |
+  { 'representative' : null } |
+  { 'teamMember' : null };
+export interface Schedule {
+  'id' : string,
+  'messageContent' : string,
+  'templateId' : string,
+  'runCount' : bigint,
+  'lastRunTimestamp' : [] | [Time],
+  'templateName' : string,
+  'recipients' : Array<RecipientRecord>,
+  'scheduleType' : ScheduleType,
+  'runAtTimestamp' : [] | [Time],
+}
+export type ScheduleType = { 'immediate' : null } |
+  { 'daily' : null };
 export interface SubmittedDocument {
   'id' : string,
   'fileName' : string,
   'fileContent' : ExternalBlob,
   'docType' : DocumentType,
   'uploadedAt' : Time,
+}
+export interface TemplateComponent {
+  'example' : [] | [Example],
+  'format' : [] | [string],
+}
+export interface TemplateInput { 'content' : string, 'name' : string }
+export interface TemplateUpdateInput {
+  'id' : string,
+  'content' : string,
+  'name' : string,
 }
 export type Time = bigint;
 export interface TransformationInput {
@@ -122,6 +167,13 @@ export interface WhatsAppMessage {
   'sender' : string,
   'timestamp' : Time,
 }
+export interface WhatsAppTemplate {
+  'id' : string,
+  'content' : string,
+  'name' : string,
+  'createdAt' : Time,
+  'updatedAt' : [] | [Time],
+}
 export interface _CaffeineStorageCreateCertificateResult {
   'method' : string,
   'blob_hash' : string,
@@ -158,20 +210,34 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'addFAQ' : ActorMethod<[string, string, string], undefined>,
   'addPartnerBenefit' : ActorMethod<[string, string, string], undefined>,
+  'addRecipient' : ActorMethod<
+    [string, string, string, RecipientType, string],
+    undefined
+  >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'createTemplate' : ActorMethod<[TemplateInput], string>,
+  'deleteSchedule' : ActorMethod<[string], undefined>,
+  'deleteTemplate' : ActorMethod<[string], undefined>,
   'getAllContactFormSubmissions' : ActorMethod<
     [],
     Array<ContactFormSubmission>
   >,
+  'getAllDailySchedules' : ActorMethod<[], Array<Schedule>>,
   'getAllFAQs' : ActorMethod<[], Array<FAQ>>,
+  'getAllImmediateSchedules' : ActorMethod<[], Array<Schedule>>,
   'getAllPartnerBenefits' : ActorMethod<[], Array<PartnerBenefit>>,
+  'getAllSchedules' : ActorMethod<[], Array<Schedule>>,
   'getAllSubmittedDocuments' : ActorMethod<[], Array<SubmittedDocument>>,
+  'getAllTemplates' : ActorMethod<[], Array<WhatsAppTemplate>>,
   'getAllWhatsAppMessages' : ActorMethod<[], Array<WhatsAppMessage>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getMetaApiConfig' : ActorMethod<[], MetaApiConfig>,
   'getOfficeContactData' : ActorMethod<[], OfficeContactData>,
   'getOnboardingRequirements' : ActorMethod<[], Array<OnboardingRequirement>>,
+  'getRecipient' : ActorMethod<[string], RecipientRecord>,
+  'getSchedule' : ActorMethod<[string], Schedule>,
+  'getTemplate' : ActorMethod<[string], WhatsAppTemplate>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getWebhookVerificationStats' : ActorMethod<
     [],
@@ -182,7 +248,14 @@ export interface _SERVICE {
   'getWhatsAppTokenStatus' : ActorMethod<[], string>,
   'hasAtLeastOnePhoneNumberAttached' : ActorMethod<[], MetaPhoneNumberStatus>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'listMetaTemplates' : ActorMethod<[], Array<ExternalWhatsAppTemplate>>,
+  'listRecipients' : ActorMethod<[], Array<RecipientRecord>>,
+  'removeRecipient' : ActorMethod<[string], undefined>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
+  'scheduleMessage' : ActorMethod<
+    [string, string, ScheduleType, [] | [Time]],
+    undefined
+  >,
   'sendWhatsAppMessage' : ActorMethod<[string, string, string], undefined>,
   'sendWhatsAppMessageViaAPI' : ActorMethod<[MessagePayload], MetaApiResponse>,
   'submitContactForm' : ActorMethod<
@@ -192,6 +265,7 @@ export interface _SERVICE {
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'updateMetaApiConfig' : ActorMethod<[MetaApiConfig], undefined>,
   'updateOfficeContactData' : ActorMethod<[OfficeContactData], undefined>,
+  'updateTemplate' : ActorMethod<[TemplateUpdateInput], undefined>,
   'uploadDocument' : ActorMethod<
     [DocumentType, string, ExternalBlob],
     undefined

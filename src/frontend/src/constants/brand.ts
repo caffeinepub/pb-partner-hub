@@ -1,13 +1,13 @@
 /**
- * Brand constants for PB Partner Hub
+ * Brand constants for PB Partners Hub
  * Centralized brand assets and configuration
  */
 
 export const BRAND = {
-  name: 'PB Partner Hub',
+  name: 'PB Partners Hub',
   logo: {
-    path: '/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png',
-    alt: 'PB Partner Hub',
+    path: '/assets/generated/pb-partners-hub-logo.dim_512x512.png',
+    alt: 'PB Partners Hub',
     displaySize: {
       width: 40,
       height: 40,

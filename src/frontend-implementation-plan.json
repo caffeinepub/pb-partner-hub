@@ -1,51 +1,66 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "WhatsApp dashboard: approved recipient number management + client-side send blocking",
+  "title": "Redesign Page 3 into a production-ready layout (match Page 2 quality)",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Add an admin UI in WhatsAppDashboardPage to view/add/remove approved WhatsApp recipient numbers (including approving 9168761915).",
+      "id": "REQ-1",
+      "summary": "Replace the /page-3 placeholder with a full, production-ready multi-section layout (hero, grid/cards, detailed content, CTA) consistent with Page 2.",
       "acceptanceCriteria": [
-        "In WhatsAppDashboardPage, an admin can add \"9168761915\" to the approved recipient list from the UI and see a success confirmation in English.",
-        "The approved list is visible to admins and updates immediately after add/remove without requiring a full page refresh.",
-        "An admin can remove an approved number from the list via the UI and see the list update accordingly."
+        "Visiting `/page-3` no longer shows the current placeholder content (e.g., remove the generic placeholder paragraphs).",
+        "Page 3 contains at least: (1) a hero section with headline + supporting text, (2) a multi-card/grid section, (3) a detailed content section (bullets/steps), and (4) a final CTA section.",
+        "All sections are responsive (mobile, tablet, desktop) and use existing Tailwind + shadcn/ui components consistently."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/backend.d.ts",
+          "path": "frontend/src/pages/Page3Page.tsx",
           "operation": "modify",
-          "description": "Extend the typed backend interface to include the new admin-only approved-recipient-number capabilities (list/add/remove) so the frontend can call them safely."
-        },
+          "description": "Redesign the page to mirror Page 2’s structure: build a hero section, a multi-card/grid section, a detailed bullets/steps section (e.g., “How PB Partners Hub helps partners”), and a closing CTA section. Compose the layout using existing Tailwind design tokens and shadcn/ui components (e.g., Card) for consistent styling. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Update Page 3 SEO metadata with meaningful English title/description aligned to PB Partners Hub content while keeping canonical /page-3.",
+      "acceptanceCriteria": [
+        "`frontend/src/pages/Page3Page.tsx` uses an updated `<SEO>` title and description (English) that are not generic (avoid “Page 3” / placeholder-style descriptions).",
+        "Canonical remains `/page-3`."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/pages/Page3Page.tsx",
           "operation": "modify",
-          "description": "Add React Query hooks for approved WhatsApp recipient number management: fetch approved list, add number, remove number; ensure mutations invalidate/refetch the approved list query for immediate UI updates. (Uses core-infrastructure actor plumbing; Verify the component's usage instructions before implementing.)"
-        },
-        {
-          "path": "frontend/src/pages/WhatsAppDashboardPage.tsx",
-          "operation": "modify",
-          "description": "Add an \"Approved Recipients\" management section for admins: render the current approved list, provide an input to approve a new phone number (allow approving 9168761915), and add remove actions; show English success/error toasts; keep the list in sync via the new React Query hooks. (Uses shadcn-ui components already in the page; Verify the component's usage instructions before implementing.)"
+          "description": "Update the <SEO> props to a non-generic English title/description aligned with the new Page 3 content and PB Partners Hub positioning; keep canonical set to `/page-3`."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Block Meta API sends in the dashboard unless the selected recipient is approved; show an English error message when blocked and handle backend rejection gracefully.",
+      "summary": "Add prominent Page 3 navigation CTAs linking to existing flows (/partner-onboarding and /contact) using the same Link/Button patterns as Page 2.",
       "acceptanceCriteria": [
-        "When attempting to send via Meta API to a recipient that is not approved, the backend rejects the request and the frontend shows an English error toast/message (no message is stored as delivered).",
-        "When the recipient is approved (e.g., 9168761915), the Meta API send action proceeds (subject to existing connection/token checks) and the frontend shows the existing success toast on success."
+        "Page 3 includes at least two prominent CTA buttons/links that navigate to `/partner-onboarding` and `/contact`.",
+        "CTAs use TanStack Router `<Link>` and shadcn `<Button>` styling consistent with other pages (e.g., Page 2)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useQueries.ts",
+          "path": "frontend/src/pages/Page3Page.tsx",
           "operation": "modify",
-          "description": "Ensure the approved-recipient hooks expose enough state (approved list + loading/error) for the send flow to check approval before attempting the Meta API mutation; keep query keys consistent so invalidation updates send-blocking logic immediately. (Uses core-infrastructure actor plumbing; Verify the component's usage instructions before implementing.)"
-        },
+          "description": "Add CTA blocks (at least in the hero and final CTA sections) that use TanStack Router <Link> to route to `/partner-onboarding` and `/contact`, styled with shadcn/ui <Button> variants consistent with Page 2. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Ensure Page 3 uses a coherent theme consistent with the existing site (typography, spacing, backgrounds) without global theme changes.",
+      "acceptanceCriteria": [
+        "Page 3 uses consistent typography scale (headings, body), spacing, and section backgrounds (e.g., subtle gradients or muted section backgrounds similar to Page 2).",
+        "No new global theme changes are required; styling stays within the existing Tailwind/theme variables."
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/pages/WhatsAppDashboardPage.tsx",
+          "path": "frontend/src/pages/Page3Page.tsx",
           "operation": "modify",
-          "description": "Update the Meta API send handler to enforce approved-recipient checks: if selectedContact is not in the approved list, do not call the send mutation and show an English error telling the admin to approve the number first; additionally, if the backend rejects the send due to approval/authorization, surface an English error toast/message and do not clear the message input."
+          "description": "Apply Page 2-aligned section styling (e.g., gradient hero background, muted background for a mid-page section, consistent container widths, spacing, and heading scales) using existing Tailwind theme variables/classes only; avoid any global theme edits."
         }
       ]
     }

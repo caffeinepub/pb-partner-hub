@@ -1,13 +1,18 @@
 import { Link } from '@tanstack/react-router';
 import { Heart } from 'lucide-react';
 import { BRAND } from '@/constants/brand';
+import HostingerZipDownloadLink from './HostingerZipDownloadLink';
 
 const footerLinks = {
   company: [
     { name: 'About Us', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Partner Onboarding', href: '/partner-onboarding' },
-    { name: 'Contact', href: '/contact' },
+    { name: 'Partner Support', href: '/partner-support' },
+    { name: 'Insurance Services', href: '/insurance-services' },
+    { name: 'Contact Us', href: '/contact' },
+    { name: 'Page 2', href: '/page-2' },
+    { name: 'Page 3', href: '/page-3' },
+    { name: 'Page 4', href: '/page-4' },
+    { name: 'Page 5', href: '/page-5' },
   ],
   legal: [
     { name: 'Privacy Policy', href: '/privacy-policy' },
@@ -27,6 +32,8 @@ export default function Footer() {
               <img
                 src={BRAND.logo.path}
                 alt={BRAND.logo.alt}
+                width={BRAND.logo.displaySize.width}
+                height={BRAND.logo.displaySize.height}
                 className="h-10 w-10"
               />
               <span className="text-xl font-bold text-primary">{BRAND.name}</span>
@@ -109,9 +116,14 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t">
+        {/* Hostinger ZIP Download */}
+        <div className="mt-8 pt-6 border-t">
+          <HostingerZipDownloadLink />
+        </div>
+
+        <div className="mt-8 pt-8 border-t">
           <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-1 flex-wrap">
-            © 2025 PB Partner Hub. All rights reserved. Built with{' '}
+            © 2026. Built with{' '}
             <Heart className="h-4 w-4 text-red-500 fill-red-500" /> using{' '}
             <a
               href="https://caffeine.ai"

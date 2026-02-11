@@ -25,16 +25,27 @@ export interface MetaApiResponse {
     deliveryStatus: MessageStatus;
     metaMessageId: string;
 }
-export interface FAQ {
-    question: string;
-    answer: string;
-}
 export interface TransformationOutput {
     status: bigint;
     body: Uint8Array;
     headers: Array<http_header>;
 }
+export interface WhatsAppTemplate {
+    id: string;
+    content: string;
+    name: string;
+    createdAt: Time;
+    updatedAt?: Time;
+}
 export type Time = bigint;
+export interface FAQ {
+    question: string;
+    answer: string;
+}
+export interface Language {
+    code: string;
+    policy: string;
+}
 export interface ContactFormSubmission {
     name: string;
     email: string;
@@ -43,9 +54,20 @@ export interface ContactFormSubmission {
     timestamp: Time;
     phone: string;
 }
+export interface Example {
+    body_text: Array<string>;
+}
 export interface PartnerBenefit {
     title: string;
     description: string;
+}
+export interface ExternalWhatsAppTemplate {
+    id: string;
+    status: string;
+    name: string;
+    components: Array<TemplateComponent>;
+    language: Language;
+    category: string;
 }
 export interface TransformationInput {
     context: Uint8Array;
@@ -56,10 +78,18 @@ export interface WebhookVerificationLogEntry {
     response: MetaWebhookVerificationResponse;
     timestamp: Time;
 }
+export interface TemplateInput {
+    content: string;
+    name: string;
+}
 export interface MetaApiConfig {
     whatsappBusinessAccountId: string;
     accessToken: string;
     phoneNumberId: string;
+}
+export interface TemplateComponent {
+    example?: Example;
+    format?: string;
 }
 export interface OfficeContactData {
     city: string;
@@ -72,6 +102,17 @@ export interface OfficeContactData {
 export interface MetaWebhookVerificationResponse {
     responseBody: string;
     responseCode: bigint;
+}
+export interface Schedule {
+    id: string;
+    messageContent: string;
+    templateId: string;
+    runCount: bigint;
+    lastRunTimestamp?: Time;
+    templateName: string;
+    recipients: Array<RecipientRecord>;
+    scheduleType: ScheduleType;
+    runAtTimestamp?: Time;
 }
 export interface WebhookVerificationStats {
     modeMismatched: bigint;
@@ -95,6 +136,13 @@ export interface http_request_result {
     status: bigint;
     body: Uint8Array;
     headers: Array<http_header>;
+}
+export interface RecipientRecord {
+    description: string;
+    partnerId: string;
+    phoneNumber: string;
+    recipientType: RecipientType;
+    sourceSystem: string;
 }
 export interface OnboardingRequirement {
     description: string;
@@ -128,17 +176,15 @@ export interface MetaWebhookVerificationRequest {
     verifyToken: string;
     mode: string;
 }
+export interface TemplateUpdateInput {
+    id: string;
+    content: string;
+    name: string;
+}
 export interface UserProfile {
     name: string;
     email?: string;
     phone?: string;
-}
-export interface RecipientRecord {
-    phoneNumber: string;
-    partnerId: string;
-    sourceSystem: string;
-    recipientType: RecipientType;
-    description: string;
 }
 export enum DocumentType {
     bankDetails = "bankDetails",
@@ -155,32 +201,47 @@ export enum MessageStatus {
     delivered = "delivered",
     failed = "failed"
 }
+export enum RecipientType {
+    individual = "individual",
+    automatedSystem = "automatedSystem",
+    corporateClient = "corporateClient",
+    representative = "representative",
+    teamMember = "teamMember"
+}
+export enum ScheduleType {
+    immediate = "immediate",
+    daily = "daily"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
 }
-export enum RecipientType {
-    individual = "individual",
-    corporateClient = "corporateClient",
-    teamMember = "teamMember",
-    representative = "representative",
-    automatedSystem = "automatedSystem"
-}
 export interface backendInterface {
     addFAQ(id: string, question: string, answer: string): Promise<void>;
     addPartnerBenefit(id: string, title: string, description: string): Promise<void>;
+    addRecipient(phoneNumber: string, partnerId: string, sourceSystem: string, recipientType: RecipientType, description: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    createTemplate(input: TemplateInput): Promise<string>;
+    deleteSchedule(id: string): Promise<void>;
+    deleteTemplate(id: string): Promise<void>;
     getAllContactFormSubmissions(): Promise<Array<ContactFormSubmission>>;
+    getAllDailySchedules(): Promise<Array<Schedule>>;
     getAllFAQs(): Promise<Array<FAQ>>;
+    getAllImmediateSchedules(): Promise<Array<Schedule>>;
     getAllPartnerBenefits(): Promise<Array<PartnerBenefit>>;
+    getAllSchedules(): Promise<Array<Schedule>>;
     getAllSubmittedDocuments(): Promise<Array<SubmittedDocument>>;
+    getAllTemplates(): Promise<Array<WhatsAppTemplate>>;
     getAllWhatsAppMessages(): Promise<Array<WhatsAppMessage>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
     getMetaApiConfig(): Promise<MetaApiConfig>;
     getOfficeContactData(): Promise<OfficeContactData>;
     getOnboardingRequirements(): Promise<Array<OnboardingRequirement>>;
+    getRecipient(phoneNumber: string): Promise<RecipientRecord>;
+    getSchedule(id: string): Promise<Schedule>;
+    getTemplate(id: string): Promise<WhatsAppTemplate>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getWebhookVerificationStats(): Promise<WebhookVerificationStats | null>;
     getWhatsAppAccountDetails(): Promise<MetaApiConfig | null>;
@@ -188,16 +249,18 @@ export interface backendInterface {
     getWhatsAppTokenStatus(): Promise<string>;
     hasAtLeastOnePhoneNumberAttached(): Promise<MetaPhoneNumberStatus>;
     isCallerAdmin(): Promise<boolean>;
+    listMetaTemplates(): Promise<Array<ExternalWhatsAppTemplate>>;
+    listRecipients(): Promise<Array<RecipientRecord>>;
+    removeRecipient(phoneNumber: string): Promise<void>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
+    scheduleMessage(templateId: string, recipientPhoneNumber: string, scheduleType: ScheduleType, runAtTimestamp: Time | null): Promise<void>;
     sendWhatsAppMessage(sender: string, recipient: string, content: string): Promise<void>;
     sendWhatsAppMessageViaAPI(payload: MessagePayload): Promise<MetaApiResponse>;
     submitContactForm(name: string, email: string, phone: string, company: string, message: string): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     updateMetaApiConfig(config: MetaApiConfig): Promise<void>;
     updateOfficeContactData(data: OfficeContactData): Promise<void>;
+    updateTemplate(input: TemplateUpdateInput): Promise<void>;
     uploadDocument(docType: DocumentType, fileName: string, fileContent: ExternalBlob): Promise<void>;
     verifyMetaWebhook(request: MetaWebhookVerificationRequest): Promise<WebhookVerificationOutcome>;
-    getApprovedRecipients(): Promise<Array<RecipientRecord>>;
-    addApprovedRecipient(record: RecipientRecord): Promise<void>;
-    removeApprovedRecipient(phoneNumber: string): Promise<void>;
 }

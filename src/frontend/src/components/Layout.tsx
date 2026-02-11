@@ -1,6 +1,8 @@
 import { Outlet } from '@tanstack/react-router';
 import Header from './Header';
 import Footer from './Footer';
+import ChatbotWidget from './chatbot/ChatbotWidget';
+import WhatsAppFloatingButton from './WhatsAppFloatingButton';
 
 export default function Layout() {
   return (
@@ -10,6 +12,8 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <ChatbotWidget />
+      <WhatsAppFloatingButton />
     </div>
   );
 }

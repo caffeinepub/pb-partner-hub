@@ -5,67 +5,67 @@
 @layer base {
     :root {
         --radius: 0.625rem;
-        /* Professional blue-based color scheme for PBPartners branding */
-        --background: 1 0 0;
-        --foreground: 0.145 0 0;
+        /* Warm neutral, trust-focused color scheme */
+        --background: 0.99 0.01 60;
+        --foreground: 0.20 0.02 40;
         --card: 1 0 0;
-        --card-foreground: 0.145 0 0;
+        --card-foreground: 0.20 0.02 40;
         --popover: 1 0 0;
-        --popover-foreground: 0.145 0 0;
-        /* Primary: Professional blue */
-        --primary: 0.45 0.18 250;
+        --popover-foreground: 0.20 0.02 40;
+        /* Primary: Warm teal/blue-green for trust */
+        --primary: 0.50 0.12 200;
         --primary-foreground: 0.99 0 0;
-        /* Secondary: Light blue-gray */
-        --secondary: 0.95 0.01 240;
-        --secondary-foreground: 0.25 0.05 250;
-        /* Muted: Soft gray-blue */
-        --muted: 0.96 0.01 240;
-        --muted-foreground: 0.50 0.02 240;
-        /* Accent: Vibrant blue */
-        --accent: 0.55 0.20 245;
-        --accent-foreground: 0.99 0 0;
+        /* Secondary: Warm beige */
+        --secondary: 0.94 0.02 60;
+        --secondary-foreground: 0.30 0.03 50;
+        /* Muted: Soft warm gray */
+        --muted: 0.95 0.01 50;
+        --muted-foreground: 0.50 0.02 40;
+        /* Accent: Warm amber */
+        --accent: 0.65 0.15 70;
+        --accent-foreground: 0.20 0.02 40;
         --destructive: 0.577 0.245 27.325;
         --destructive-foreground: 0.985 0 0;
-        /* Borders and inputs: Subtle blue-gray */
-        --border: 0.90 0.01 240;
-        --input: 0.90 0.01 240;
-        --ring: 0.45 0.18 250;
-        --chart-1: 0.55 0.20 245;
-        --chart-2: 0.60 0.15 210;
-        --chart-3: 0.50 0.18 270;
-        --chart-4: 0.65 0.12 200;
-        --chart-5: 0.45 0.22 260;
+        /* Borders and inputs: Subtle warm gray */
+        --border: 0.88 0.01 50;
+        --input: 0.88 0.01 50;
+        --ring: 0.50 0.12 200;
+        --chart-1: 0.55 0.14 200;
+        --chart-2: 0.60 0.12 180;
+        --chart-3: 0.65 0.15 70;
+        --chart-4: 0.50 0.10 220;
+        --chart-5: 0.70 0.12 90;
     }
 
     .dark {
-        --background: 0.145 0 0;
-        --foreground: 0.985 0 0;
-        --card: 0.18 0.01 240;
-        --card-foreground: 0.985 0 0;
-        --popover: 0.20 0.01 240;
-        --popover-foreground: 0.985 0 0;
-        /* Primary: Bright blue for dark mode */
-        --primary: 0.65 0.20 245;
-        --primary-foreground: 0.10 0.02 240;
-        /* Secondary: Dark blue-gray */
-        --secondary: 0.25 0.02 240;
-        --secondary-foreground: 0.95 0.01 240;
-        /* Muted: Medium gray-blue */
-        --muted: 0.30 0.02 240;
-        --muted-foreground: 0.70 0.02 240;
-        /* Accent: Vibrant blue */
-        --accent: 0.55 0.22 250;
-        --accent-foreground: 0.99 0 0;
+        --background: 0.18 0.02 40;
+        --foreground: 0.95 0.01 60;
+        --card: 0.22 0.02 40;
+        --card-foreground: 0.95 0.01 60;
+        --popover: 0.24 0.02 40;
+        --popover-foreground: 0.95 0.01 60;
+        /* Primary: Bright teal for dark mode */
+        --primary: 0.65 0.14 200;
+        --primary-foreground: 0.15 0.02 40;
+        /* Secondary: Dark warm gray */
+        --secondary: 0.28 0.02 50;
+        --secondary-foreground: 0.92 0.01 60;
+        /* Muted: Medium warm gray */
+        --muted: 0.32 0.02 45;
+        --muted-foreground: 0.70 0.02 50;
+        /* Accent: Warm amber */
+        --accent: 0.70 0.16 70;
+        --accent-foreground: 0.15 0.02 40;
         --destructive: 0.704 0.191 22.216;
         --destructive-foreground: 0.99 0 0;
-        --border: 0.25 0.02 240;
-        --input: 0.30 0.02 240;
-        --ring: 0.65 0.20 245;
-        --chart-1: 0.60 0.22 245;
-        --chart-2: 0.65 0.18 210;
-        --chart-3: 0.55 0.20 270;
-        --chart-4: 0.70 0.15 200;
-        --chart-5: 0.50 0.24 260;
+        --border: 0.28 0.02 45;
+        --input: 0.32 0.02 45;
+        --ring: 0.65 0.14 200;
+        --chart-1: 0.60 0.16 200;
+        --chart-2: 0.65 0.14 180;
+        --chart-3: 0.70 0.16 70;
+        --chart-4: 0.55 0.12 220;
+        --chart-5: 0.75 0.14 90;
     }
 
     * {

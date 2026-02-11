@@ -1,12 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Add an admin-only approved-recipient list for WhatsApp numbers and enforce approval before sending WhatsApp messages via the Meta API.
+**Goal:** Replace the `/page-3` placeholder with a production-ready Page 3 layout that matches the visual quality and section structure of Page 2, including updated SEO and clear navigation CTAs.
 
 **Planned changes:**
-- Add backend storage for an admin-managed list of approved WhatsApp recipient phone numbers, pre-populated with `9168761915`.
-- Expose admin-only backend methods to list, add, and remove approved recipient numbers; deny non-admin access.
-- Update the WhatsApp admin dashboard to display the approved list, allow adding a number, and allow removing a number, with immediate UI updates and English success confirmations.
-- Enforce approved-number checks on WhatsApp send: reject sends to non-approved recipients in the backend and show an English error message in the frontend; allow sends when the recipient is approved.
+- Redesign `/page-3` to remove placeholder content and add a full layout: hero section, multi-card/grid section, detailed content section (bullets/steps), and a final CTA section.
+- Ensure Page 3 styling is cohesive with existing site patterns (Tailwind + shadcn/ui composition) and responsive across mobile/tablet/desktop.
+- Update Page 3 SEO metadata (English title + description) while keeping canonical URL as `/page-3`.
+- Add prominent CTA links/buttons routing to existing flows: `/partner-onboarding` and `/contact`, using the same Link/Button patterns as Page 2.
 
-**User-visible outcome:** Admins can view and manage approved WhatsApp recipient numbers in the dashboard, and messages can only be sent to recipients that have been approved (including `9168761915`), with clear English success/error feedback.
+**User-visible outcome:** Visiting `/page-3` shows a complete, responsive marketing-style page with clear sections and CTA buttons that navigate to partner onboarding and contact.

@@ -9,7 +9,7 @@ interface SEOProps {
 
 export default function SEO({ title, description, canonical, type = 'website' }: SEOProps) {
   useEffect(() => {
-    const fullTitle = `${title} | PB Partner Hub`;
+    const fullTitle = `${title} | PB Partners Hub`;
     const baseUrl = window.location.origin;
     const canonicalUrl = canonical ? `${baseUrl}${canonical}` : baseUrl;
 
@@ -71,11 +71,11 @@ export default function SEO({ title, description, canonical, type = 'website' }:
     scriptElement.textContent = JSON.stringify({
       '@context': 'https://schema.org',
       '@type': 'Organization',
-      name: 'PB Partner Hub',
+      name: 'PB Partners Hub',
       description:
         'Supporting PBPartners by helping insurance partners with onboarding, document support, and business development.',
       url: baseUrl,
-      logo: `${baseUrl}/assets/generated/pb-partner-hub-logo-transparent.dim_200x200.png`,
+      logo: `${baseUrl}/assets/generated/pb-partners-hub-logo.dim_512x512.png`,
       address: {
         '@type': 'PostalAddress',
         streetAddress: 'Flat No 2, Sudarshan Housing Society, Indira Nagar',

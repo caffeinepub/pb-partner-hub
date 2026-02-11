@@ -1,74 +1,100 @@
 {
   "kind": "build_request",
-  "title": "Add admin approval list for WhatsApp recipient numbers (approve 9168761915)",
+  "title": "Design and build Page 3 (replace placeholder with full layout)",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Add backend support for an admin-managed list of approved WhatsApp recipient phone numbers, and store the phone number \"9168761915\" as an approved number.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "WhatsApp API approve 9168761915"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend exposes admin-only methods to: (1) list approved recipient numbers, (2) add an approved recipient number, and (3) remove an approved recipient number.",
-        "Non-admin callers cannot read or modify the approved recipient number list (must trap/deny).",
-        "After adding \"9168761915\", it appears in the returned approved recipient list."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Update the WhatsApp admin dashboard UI to manage approved recipient numbers: show the current approved list, provide an input to approve a new phone number, and allow removing an approved number.",
+      "text": "Redesign the `/page-3` page to replace the current placeholder card with a fully designed, production-ready page layout that matches the visual quality and structure of Page 2 (hero, content sections, and CTA).",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "WhatsApp API approve 9168761915"
+          "start Page 3 design."
         ]
       },
       "acceptanceCriteria": [
-        "In WhatsAppDashboardPage, an admin can add \"9168761915\" to the approved recipient list from the UI and see a success confirmation in English.",
-        "The approved list is visible to admins and updates immediately after add/remove without requiring a full page refresh.",
-        "An admin can remove an approved number from the list via the UI and see the list update accordingly."
+        "Visiting `/page-3` no longer shows the current placeholder content (e.g., remove the generic placeholder paragraphs).",
+        "Page 3 contains at least: (1) a hero section with headline + supporting text, (2) a multi-card/grid section, (3) a detailed content section (bullets/steps), and (4) a final CTA section.",
+        "All sections are responsive (mobile, tablet, desktop) and use existing Tailwind + shadcn/ui components consistently."
       ]
     },
     {
-      "id": "REQ-3",
-      "text": "Enforce approved-number checking when sending a WhatsApp message via the Meta API from the dashboard: if the selected recipient is not in the approved list, block the send and show an English error message telling the admin to approve the number first.",
-      "target": "both",
+      "id": "REQ-2",
+      "text": "Update Page 3 SEO metadata to use a meaningful English title and description aligned with PB Partners Hub and the new Page 3 content, keeping the canonical URL as `/page-3`.",
+      "target": "frontend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "WhatsApp API approve 9168761915"
+          "start Page 3 design."
         ]
       },
       "acceptanceCriteria": [
-        "When attempting to send via Meta API to a recipient that is not approved, the backend rejects the request and the frontend shows an English error toast/message (no message is stored as delivered).",
-        "When the recipient is approved (e.g., 9168761915), the Meta API send action proceeds (subject to existing connection/token checks) and the frontend shows the existing success toast on success."
+        "`frontend/src/pages/Page3Page.tsx` uses an updated `<SEO>` title and description (English) that are not generic (avoid “Page 3” / placeholder-style descriptions).",
+        "Canonical remains `/page-3`."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Add clear navigation CTAs on Page 3 that route to existing flows (at minimum `/partner-onboarding` and `/contact`) using the existing button/link patterns used on Page 2.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "start Page 3 design."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Page 3 includes at least two prominent CTA buttons/links that navigate to `/partner-onboarding` and `/contact`.",
+        "CTAs use TanStack Router `<Link>` and shadcn `<Button>` styling consistent with other pages (e.g., Page 2)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Apply a coherent visual theme for Page 3 that fits the existing site styling (use existing design tokens and patterns) and keep spacing/typography consistent across sections.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "start Page 3 design."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Page 3 uses consistent typography scale (headings, body), spacing, and section backgrounds (e.g., subtle gradients or muted section backgrounds similar to Page 2).",
+        "No new global theme changes are required; styling stays within the existing Tailwind/theme variables."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit frontend files under frontend/src/components/ui or any other immutablePaths listed in SYSTEM_CONTEXT.",
-    "Use English for any user-facing text."
+    "Do not edit files in `frontend/src/components/ui` (shadcn components are read-only and must be composed).",
+    "Do not modify immutable hook files: `frontend/src/hooks/useInternetIdentity.ts(x)`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`.",
+    "Keep routing path `/page-3` unchanged (already registered in `frontend/src/App.tsx`)."
   ],
   "nonGoals": [
-    "Implementing third-party WhatsApp providers (e.g., Interakt) or adding new external integrations beyond the existing Meta API approach.",
-    "Implementing inbound WhatsApp webhook message receiving/processing.",
-    "Building real-time messaging (WebSockets/push)."
+    "No backend/canister changes for this request.",
+    "No changes to Page 2 behavior/content aside from referencing its UI patterns.",
+    "No new authentication or admin features."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

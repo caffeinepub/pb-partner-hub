@@ -2,11 +2,31 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-whatsapp-admin-dashboard-ui-to-manage-approved-recipient-numbers-show-the-current-approved-list-provide-an-input-to-approve-a-new-phone-number-and-allow-removing-an-approved-number",
-      "featureTitle": "Update the WhatsApp admin dashboard UI to manage approved recipient numbers: show the current approved list, provide an input to approve a new phone number, and allow removing an approved number.",
+      "featureId": "feature-redesign-the-page-3-page-to-replace-the-current-placeholder-card-with-a-fully-designed-production-ready-page-layout-that-matches-the-visual-quality-and-structure-of-page-2-hero-content-sections-and-cta",
+      "featureTitle": "Redesign the `/page-3` page to replace the current placeholder card with a fully designed, production-ready page layout that matches the visual quality and structure of Page 2 (hero, content sections, and CTA).",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/WhatsAppDashboardPage.tsx"
+        "frontend/src/pages/Page3Page.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-page-3-seo-metadata-to-use-a-meaningful-english-title-and-description-aligned-with-pb-partners-hub-and-the-new-page-3-content-keeping-the-canonical-url-as-page-3",
+      "featureTitle": "Update Page 3 SEO metadata to use a meaningful English title and description aligned with PB Partners Hub and the new Page 3 content, keeping the canonical URL as `/page-3`.",
+      "files": [
+        "frontend/src/pages/Page3Page.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -24,11 +44,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-enforce-approved-number-checking-when-sending-a-whatsapp-message-via-the-meta-api-from-the-dashboard-if-the-selected-recipient-is-not-in-the-approved-list-block-the-send-and-show-an-english-error-message-telling-the-admin-to-approve-the-number-first",
-      "featureTitle": "Enforce approved-number checking when sending a WhatsApp message via the Meta API from the dashboard: if the selected recipient is not in the approved list, block the send and show an English error message telling the admin to approve the number first.",
+      "featureId": "feature-add-clear-navigation-ctas-on-page-3-that-route-to-existing-flows-at-minimum-partner-onboarding-and-contact-using-the-existing-button-link-patterns-used-on-page-2",
+      "featureTitle": "Add clear navigation CTAs on Page 3 that route to existing flows (at minimum `/partner-onboarding` and `/contact`) using the existing button/link patterns used on Page 2.",
       "files": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend/src/pages/WhatsAppDashboardPage.tsx"
+        "frontend/src/pages/Page3Page.tsx"
       ],
       "components": [
         "core-infrastructure@1.0.2",
@@ -42,6 +61,27 @@
       ],
       "testIds": [
         "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-apply-a-coherent-visual-theme-for-page-3-that-fits-the-existing-site-styling-use-existing-design-tokens-and-patterns-and-keep-spacing-typography-consistent-across-sections",
+      "featureTitle": "Apply a coherent visual theme for Page 3 that fits the existing site styling (use existing design tokens and patterns) and keep spacing/typography consistent across sections.",
+      "files": [
+        "frontend/src/pages/Page3Page.tsx"
+      ],
+      "components": [
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "http-outcalls@3.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }
