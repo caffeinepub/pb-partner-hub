@@ -1,21 +1,27 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
-import { useSubmitContactForm } from '@/hooks/useQueries';
-import { toast } from 'sonner';
-import SEO from '@/components/SEO';
+import SEO from "@/components/SEO";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useSubmitContactForm } from "@/hooks/useQueries";
+import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    message: '',
+    name: "",
+    email: "",
+    phone: "",
+    company: "",
+    message: "",
   });
 
   const submitContactForm = useSubmitContactForm();
@@ -24,14 +30,16 @@ export default function ContactPage() {
     e.preventDefault();
     try {
       await submitContactForm.mutateAsync(formData);
-      toast.success('Thank you! Your message has been sent successfully.');
-      setFormData({ name: '', email: '', phone: '', company: '', message: '' });
-    } catch (error) {
-      toast.error('Failed to send message. Please try again.');
+      toast.success("Thank you! Your message has been sent successfully.");
+      setFormData({ name: "", email: "", phone: "", company: "", message: "" });
+    } catch (_error) {
+      toast.error("Failed to send message. Please try again.");
     }
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -50,7 +58,8 @@ export default function ContactPage() {
               Get in Touch With PB Partners Hub
             </h1>
             <p className="text-lg text-muted-foreground">
-              We're here to help. Reach out to us through any of the channels below.
+              We're here to help. Reach out to us through any of the channels
+              below.
             </p>
           </div>
 
@@ -59,7 +68,9 @@ export default function ContactPage() {
             <Card className="border-2">
               <CardHeader>
                 <CardTitle>Send us a Message</CardTitle>
-                <CardDescription>Fill out the form and we'll get back to you soon.</CardDescription>
+                <CardDescription>
+                  Fill out the form and we'll get back to you soon.
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -115,8 +126,14 @@ export default function ContactPage() {
                       required
                     />
                   </div>
-                  <Button type="submit" className="w-full" disabled={submitContactForm.isPending}>
-                    {submitContactForm.isPending ? 'Sending...' : 'Send Message'}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    disabled={submitContactForm.isPending}
+                  >
+                    {submitContactForm.isPending
+                      ? "Sending..."
+                      : "Send Message"}
                   </Button>
                 </form>
               </CardContent>
@@ -147,7 +164,9 @@ export default function ContactPage() {
                     <MessageCircle className="h-5 w-5 text-primary mt-0.5" />
                     <div>
                       <p className="font-medium">WhatsApp Support Available</p>
-                      <p className="text-muted-foreground">Click the WhatsApp button to connect</p>
+                      <p className="text-muted-foreground">
+                        Click the WhatsApp button to connect
+                      </p>
                     </div>
                   </div>
                 </CardContent>
@@ -162,8 +181,8 @@ export default function ContactPage() {
                     <MapPin className="h-5 w-5 text-primary mt-0.5" />
                     <div>
                       <p className="text-muted-foreground">
-                        Flat No 2, Sudarshan Housing Society, Indira Nagar, Nashik, Maharashtra
-                        422009, District Nashik
+                        Flat No 2, Sudarshan Housing Society, Indira Nagar,
+                        Nashik, Maharashtra 422009, District Nashik
                       </p>
                     </div>
                   </div>

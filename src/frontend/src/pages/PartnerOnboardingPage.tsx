@@ -1,68 +1,86 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Link } from '@tanstack/react-router';
-import { CheckCircle, CreditCard, Fingerprint, Building2, GraduationCap, Phone, Mail, Camera, Upload, X, FileCheck } from 'lucide-react';
-import { toast } from 'sonner';
-import SEO from '@/components/SEO';
-import { useUploadDocument } from '@/hooks/useQueries';
-import { DocumentType } from '@/backend';
+import { DocumentType } from "@/backend";
+import SEO from "@/components/SEO";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { useUploadDocument } from "@/hooks/useQueries";
+import { Link } from "@tanstack/react-router";
+import {
+  Building2,
+  Camera,
+  CheckCircle,
+  CreditCard,
+  FileCheck,
+  Fingerprint,
+  GraduationCap,
+  Mail,
+  Phone,
+  Upload,
+  X,
+} from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const requiredDocuments = [
   {
     icon: CreditCard,
-    title: 'PAN Card',
-    description: 'Valid Permanent Account Number card',
+    title: "PAN Card",
+    description: "Valid Permanent Account Number card",
     docType: DocumentType.panCard,
   },
   {
     icon: Fingerprint,
-    title: 'Aadhaar Card',
-    description: 'Government-issued identity proof',
+    title: "Aadhaar Card",
+    description: "Government-issued identity proof",
     docType: DocumentType.aadhaarCard,
   },
   {
     icon: Building2,
-    title: 'Bank Account Details',
-    description: 'Active bank account information',
+    title: "Bank Account Details",
+    description: "Active bank account information",
     docType: DocumentType.bankDetails,
   },
   {
     icon: GraduationCap,
-    title: '10th Pass Certificate / Highest Education',
-    description: 'Educational qualification proof',
+    title: "10th Pass Certificate / Highest Education",
+    description: "Educational qualification proof",
     docType: DocumentType.educationCertificate,
   },
   {
     icon: Phone,
-    title: 'Mobile Number',
-    description: 'Active mobile number for verification',
+    title: "Mobile Number",
+    description: "Active mobile number for verification",
     docType: DocumentType.mobileNumber,
   },
   {
     icon: Mail,
-    title: 'Email ID',
-    description: 'Valid email address for communication',
+    title: "Email ID",
+    description: "Valid email address for communication",
     docType: DocumentType.email,
   },
   {
     icon: Camera,
-    title: 'Selfie (Live Photo)',
-    description: 'Recent photograph for identity verification',
+    title: "Selfie (Live Photo)",
+    description: "Recent photograph for identity verification",
     docType: DocumentType.selfie,
   },
 ];
 
 const requirements = [
-  'Valid government-issued ID proof (Aadhaar, PAN, etc.)',
-  'Business registration documents',
-  'IRDAI certification (if applicable)',
-  'Bank account details',
-  'GST registration (if applicable)',
-  'Professional qualification certificates',
-  'Address proof (business and residential)',
-  'Recent passport-size photographs',
+  "Valid government-issued ID proof (Aadhaar, PAN, etc.)",
+  "Business registration documents",
+  "IRDAI certification (if applicable)",
+  "Bank account details",
+  "GST registration (if applicable)",
+  "Professional qualification certificates",
+  "Address proof (business and residential)",
+  "Recent passport-size photographs",
 ];
 
 interface UploadedFile {
@@ -109,14 +127,14 @@ export default function PartnerOnboardingPage() {
 
   const updateFileDocType = (index: number, docType: DocumentType) => {
     setUploadedFiles((prev) =>
-      prev.map((file, i) => (i === index ? { ...file, docType } : file))
+      prev.map((file, i) => (i === index ? { ...file, docType } : file)),
     );
   };
 
   const handleUploadAll = async () => {
     if (uploadedFiles.length === 0) {
-      toast.error('No files to upload', {
-        description: 'Please select at least one document to upload.',
+      toast.error("No files to upload", {
+        description: "Please select at least one document to upload.",
       });
       return;
     }
@@ -127,7 +145,7 @@ export default function PartnerOnboardingPage() {
 
         // Update progress
         setUploadedFiles((prev) =>
-          prev.map((f, idx) => (idx === i ? { ...f, progress: 50 } : f))
+          prev.map((f, idx) => (idx === i ? { ...f, progress: 50 } : f)),
         );
 
         // Read file as bytes
@@ -143,21 +161,22 @@ export default function PartnerOnboardingPage() {
 
         // Update progress to complete
         setUploadedFiles((prev) =>
-          prev.map((f, idx) => (idx === i ? { ...f, progress: 100 } : f))
+          prev.map((f, idx) => (idx === i ? { ...f, progress: 100 } : f)),
         );
       }
 
-      toast.success('Documents uploaded successfully!', {
-        description: 'Your documents have been submitted. We will review them within 48 hours.',
+      toast.success("Documents uploaded successfully!", {
+        description:
+          "Your documents have been submitted. We will review them within 48 hours.",
       });
 
       // Clear uploaded files after successful upload
       setTimeout(() => {
         setUploadedFiles([]);
       }, 2000);
-    } catch (error) {
-      toast.error('Upload failed', {
-        description: 'Please try again or contact support.',
+    } catch (_error) {
+      toast.error("Upload failed", {
+        description: "Please try again or contact support.",
       });
     }
   };
@@ -178,8 +197,8 @@ export default function PartnerOnboardingPage() {
               Partner <span className="text-primary">Onboarding</span>
             </h1>
             <p className="text-lg text-muted-foreground md:text-xl">
-              Join our network of successful insurance partners through our streamlined onboarding
-              process designed for efficiency and ease.
+              Join our network of successful insurance partners through our
+              streamlined onboarding process designed for efficiency and ease.
             </p>
           </div>
         </div>
@@ -197,21 +216,29 @@ export default function PartnerOnboardingPage() {
                 Documents Required for Insurance Agent Partner Registration
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Get started with your insurance partner journey. Here's everything you need to register.
+                Get started with your insurance partner journey. Here's
+                everything you need to register.
               </p>
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 mb-12">
               {requiredDocuments.map((doc) => (
-                <Card key={doc.title} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={doc.title}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 inline-flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
                         <doc.icon className="h-6 w-6 text-primary" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base mb-1">{doc.title}</h3>
-                        <p className="text-sm text-muted-foreground">{doc.description}</p>
+                        <h3 className="font-semibold text-base mb-1">
+                          {doc.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {doc.description}
+                        </p>
                       </div>
                     </div>
                   </CardContent>
@@ -229,7 +256,8 @@ export default function PartnerOnboardingPage() {
                     Registration is completely FREE. No hidden charges.
                   </p>
                   <p className="text-base opacity-90">
-                    Start your journey as an insurance partner today. Our team is ready to assist you with the registration process.
+                    Start your journey as an insurance partner today. Our team
+                    is ready to assist you with the registration process.
                   </p>
                   <div className="pt-4">
                     <a
@@ -267,7 +295,8 @@ export default function PartnerOnboardingPage() {
                 Upload Your Documents
               </h2>
               <p className="text-lg text-muted-foreground">
-                Upload all required documents in one go. We accept PDF, JPG, PNG formats.
+                Upload all required documents in one go. We accept PDF, JPG, PNG
+                formats.
               </p>
             </div>
 
@@ -280,8 +309,8 @@ export default function PartnerOnboardingPage() {
                   onDragLeave={handleDragLeave}
                   className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
                     isDragging
-                      ? 'border-primary bg-primary/5'
-                      : 'border-muted-foreground/25 hover:border-primary/50'
+                      ? "border-primary bg-primary/5"
+                      : "border-muted-foreground/25 hover:border-primary/50"
                   }`}
                 >
                   <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
@@ -312,17 +341,22 @@ export default function PartnerOnboardingPage() {
                 {/* Uploaded Files List */}
                 {uploadedFiles.length > 0 && (
                   <div className="mt-8 space-y-4">
-                    <h3 className="font-semibold text-lg mb-4">Selected Documents</h3>
+                    <h3 className="font-semibold text-lg mb-4">
+                      Selected Documents
+                    </h3>
                     {uploadedFiles.map((uploadedFile, index) => (
                       <div
-                        key={index}
+                        key={uploadedFile.file.name + String(index)}
                         className="flex items-center gap-4 p-4 border rounded-lg bg-muted/30"
                       >
                         <FileCheck className="h-8 w-8 text-primary flex-shrink-0" />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium truncate">{uploadedFile.file.name}</p>
+                          <p className="font-medium truncate">
+                            {uploadedFile.file.name}
+                          </p>
                           <p className="text-sm text-muted-foreground">
-                            {(uploadedFile.file.size / 1024 / 1024).toFixed(2)} MB
+                            {(uploadedFile.file.size / 1024 / 1024).toFixed(2)}{" "}
+                            MB
                           </p>
                           {uploadedFile.progress > 0 && (
                             <div className="mt-2">
@@ -338,17 +372,26 @@ export default function PartnerOnboardingPage() {
                         <select
                           value={uploadedFile.docType}
                           onChange={(e) =>
-                            updateFileDocType(index, e.target.value as DocumentType)
+                            updateFileDocType(
+                              index,
+                              e.target.value as DocumentType,
+                            )
                           }
                           className="px-3 py-2 border rounded-md bg-background text-sm"
                         >
                           <option value={DocumentType.panCard}>PAN Card</option>
-                          <option value={DocumentType.aadhaarCard}>Aadhaar Card</option>
-                          <option value={DocumentType.bankDetails}>Bank Details</option>
+                          <option value={DocumentType.aadhaarCard}>
+                            Aadhaar Card
+                          </option>
+                          <option value={DocumentType.bankDetails}>
+                            Bank Details
+                          </option>
                           <option value={DocumentType.educationCertificate}>
                             Education Certificate
                           </option>
-                          <option value={DocumentType.mobileNumber}>Mobile Number</option>
+                          <option value={DocumentType.mobileNumber}>
+                            Mobile Number
+                          </option>
                           <option value={DocumentType.email}>Email ID</option>
                           <option value={DocumentType.selfie}>Selfie</option>
                         </select>
@@ -369,7 +412,9 @@ export default function PartnerOnboardingPage() {
                       className="w-full mt-6"
                       disabled={uploadDocument.isPending}
                     >
-                      {uploadDocument.isPending ? 'Uploading...' : 'Upload All Documents'}
+                      {uploadDocument.isPending
+                        ? "Uploading..."
+                        : "Upload All Documents"}
                     </Button>
                   </div>
                 )}
@@ -388,8 +433,8 @@ export default function PartnerOnboardingPage() {
                 Additional Documentation
               </h2>
               <p className="text-lg text-muted-foreground">
-                To ensure a smooth onboarding process, please have the following documents ready
-                before you begin your application.
+                To ensure a smooth onboarding process, please have the following
+                documents ready before you begin your application.
               </p>
               <div className="space-y-3">
                 {requirements.map((requirement) => (
@@ -424,19 +469,37 @@ export default function PartnerOnboardingPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <div className="text-center">
-                  <div className="text-5xl font-bold text-primary mb-2">48 Hours</div>
-                  <div className="text-lg text-muted-foreground">After Complete Documents Received</div>
+                  <div className="text-5xl font-bold text-primary mb-2">
+                    48 Hours
+                  </div>
+                  <div className="text-lg text-muted-foreground">
+                    After Complete Documents Received
+                  </div>
                 </div>
                 <p className="text-center text-muted-foreground">
-                  48 hours required after complete documents are received. Our team will review your application and documents promptly to ensure quick activation.
+                  48 hours required after complete documents are received. Our
+                  team will review your application and documents promptly to
+                  ensure quick activation.
                 </p>
                 <div className="bg-muted/50 p-6 rounded-lg">
                   <h3 className="font-semibold mb-3">What Happens Next?</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• You'll receive email updates at each stage of the process</li>
-                    <li>• Our team may contact you for additional information if needed</li>
-                    <li>• Once approved, you'll receive login credentials and training schedule</li>
-                    <li>• Your dedicated account manager will be assigned upon activation</li>
+                    <li>
+                      • You'll receive email updates at each stage of the
+                      process
+                    </li>
+                    <li>
+                      • Our team may contact you for additional information if
+                      needed
+                    </li>
+                    <li>
+                      • Once approved, you'll receive login credentials and
+                      training schedule
+                    </li>
+                    <li>
+                      • Your dedicated account manager will be assigned upon
+                      activation
+                    </li>
                   </ul>
                 </div>
               </CardContent>
@@ -454,8 +517,9 @@ export default function PartnerOnboardingPage() {
                 Need Help with Onboarding?
               </h2>
               <p className="text-lg mb-8 max-w-2xl mx-auto opacity-90">
-                Our onboarding support team is here to assist you every step of the way. Contact us
-                for guidance or to clarify any questions about the process.
+                Our onboarding support team is here to assist you every step of
+                the way. Contact us for guidance or to clarify any questions
+                about the process.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link to="/contact">
@@ -481,24 +545,33 @@ export default function PartnerOnboardingPage() {
                 <p className="text-sm opacity-75">
                   <strong>Onboarding Support:</strong>
                   <br />
-                  Email:{' '}
-                  <a href="mailto:info@pbpartnershub.in" className="hover:underline">
+                  Email:{" "}
+                  <a
+                    href="mailto:info@pbpartnershub.in"
+                    className="hover:underline"
+                  >
                     info@pbpartnershub.in
                   </a>
-                  ,{' '}
-                  <a href="mailto:support@pbpartnershub.in" className="hover:underline">
+                  ,{" "}
+                  <a
+                    href="mailto:support@pbpartnershub.in"
+                    className="hover:underline"
+                  >
                     support@pbpartnershub.in
                   </a>
-                  ,{' '}
-                  <a href="mailto:Prashant.pbp47@gmail.com" className="hover:underline">
+                  ,{" "}
+                  <a
+                    href="mailto:Prashant.pbp47@gmail.com"
+                    className="hover:underline"
+                  >
                     Prashant.pbp47@gmail.com
                   </a>
                   <br />
-                  Mobile:{' '}
+                  Mobile:{" "}
                   <a href="tel:7972584060" className="hover:underline">
                     7972584060
-                  </a>{' '}
-                  | WhatsApp:{' '}
+                  </a>{" "}
+                  | WhatsApp:{" "}
                   <a
                     href="https://wa.me/7709446589"
                     target="_blank"

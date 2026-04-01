@@ -1,87 +1,122 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Separator } from '@/components/ui/separator';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  MessageCircle, 
-  Send, 
-  Search, 
-  Settings, 
-  Loader2, 
-  LogIn, 
-  CheckCheck, 
-  Check, 
-  Clock,
-  XCircle,
-  Users,
-  MessageSquare,
-  TrendingUp,
-  Wifi,
-  WifiOff,
-  AlertTriangle,
-  CheckCircle2,
-  Info,
-  Phone,
-  Copy,
-  ExternalLink,
-  RefreshCw,
-  Server,
-  UserCheck,
-  Trash2,
-  Plus
-} from 'lucide-react';
-import SEO from '@/components/SEO';
-import { 
-  useGetAllWhatsAppMessages, 
-  useIsCallerAdmin, 
-  useSendWhatsAppMessage,
-  useSendWhatsAppMessageViaAPI,
+import SEO from "@/components/SEO";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Separator } from "@/components/ui/separator";
+import { Textarea } from "@/components/ui/textarea";
+import { useInternetIdentity } from "@/hooks/useInternetIdentity";
+import {
+  RecipientType,
+  useAddApprovedRecipient,
+  useGetAllWhatsAppMessages,
+  useGetApprovedRecipients,
+  useGetBackendHealth,
   useGetMetaApiConfig,
-  useUpdateMetaApiConfig,
+  useGetPhoneNumberStatus,
   useGetWhatsAppIntegrationStatus,
   useGetWhatsAppTokenStatus,
-  useGetPhoneNumberStatus,
-  useGetBackendHealth,
-  useGetApprovedRecipients,
-  useAddApprovedRecipient,
+  useIsCallerAdmin,
   useRemoveApprovedRecipient,
-  RecipientType
-} from '@/hooks/useQueries';
-import { useInternetIdentity } from '@/hooks/useInternetIdentity';
-import { MessageStatus } from '../backend';
-import { toast } from 'sonner';
+  useSendWhatsAppMessage,
+  useSendWhatsAppMessageViaAPI,
+  useUpdateMetaApiConfig,
+} from "@/hooks/useQueries";
+import {
+  AlertTriangle,
+  Check,
+  CheckCheck,
+  CheckCircle2,
+  Clock,
+  Copy,
+  ExternalLink,
+  Info,
+  Loader2,
+  LogIn,
+  MessageCircle,
+  MessageSquare,
+  Phone,
+  Plus,
+  RefreshCw,
+  Search,
+  Send,
+  Server,
+  Settings,
+  Trash2,
+  TrendingUp,
+  UserCheck,
+  Users,
+  Wifi,
+  WifiOff,
+  XCircle,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
+import { MessageStatus } from "../backend";
 
 export default function WhatsAppDashboardPage() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedContact, setSelectedContact] = useState<string | null>(null);
-  const [messageContent, setMessageContent] = useState('');
-  const [accessToken, setAccessToken] = useState('');
-  const [businessAccountId, setBusinessAccountId] = useState('');
-  const [phoneNumberId, setPhoneNumberId] = useState('');
+  const [messageContent, setMessageContent] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+  const [businessAccountId, setBusinessAccountId] = useState("");
+  const [phoneNumberId, setPhoneNumberId] = useState("");
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [approvedRecipientsOpen, setApprovedRecipientsOpen] = useState(false);
-  const [newRecipientPhone, setNewRecipientPhone] = useState('');
-  const [newRecipientDescription, setNewRecipientDescription] = useState('');
-  const [newRecipientType, setNewRecipientType] = useState<RecipientType>(RecipientType.individual);
+  const [newRecipientPhone, setNewRecipientPhone] = useState("");
+  const [newRecipientDescription, setNewRecipientDescription] = useState("");
+  const [newRecipientType, setNewRecipientType] = useState<RecipientType>(
+    RecipientType.individual,
+  );
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const { identity, login, loginStatus } = useInternetIdentity();
   const { data: isAdmin, isLoading: isAdminLoading } = useIsCallerAdmin();
-  const { data: messages = [], isLoading: messagesLoading } = useGetAllWhatsAppMessages();
-  const { data: metaApiConfig, isLoading: configLoading } = useGetMetaApiConfig();
-  const { data: integrationStatus, isLoading: statusLoading } = useGetWhatsAppIntegrationStatus();
-  const { data: tokenStatus, isLoading: tokenStatusLoading } = useGetWhatsAppTokenStatus();
-  const { data: phoneNumberStatus, isLoading: phoneNumberStatusLoading } = useGetPhoneNumberStatus();
-  const { data: backendHealth, isLoading: healthLoading, error: healthError, refetch: refetchHealth } = useGetBackendHealth();
-  const { data: approvedRecipients = [], isLoading: approvedRecipientsLoading } = useGetApprovedRecipients();
+  const { data: messages = [], isLoading: messagesLoading } =
+    useGetAllWhatsAppMessages();
+  const { data: metaApiConfig, isLoading: configLoading } =
+    useGetMetaApiConfig();
+  const { data: integrationStatus, isLoading: statusLoading } =
+    useGetWhatsAppIntegrationStatus();
+  const { data: tokenStatus, isLoading: tokenStatusLoading } =
+    useGetWhatsAppTokenStatus();
+  const { data: phoneNumberStatus, isLoading: phoneNumberStatusLoading } =
+    useGetPhoneNumberStatus();
+  const {
+    data: backendHealth,
+    isLoading: healthLoading,
+    error: healthError,
+    refetch: refetchHealth,
+  } = useGetBackendHealth();
+  const {
+    data: approvedRecipients = [],
+    isLoading: approvedRecipientsLoading,
+  } = useGetApprovedRecipients();
   const sendMessageMutation = useSendWhatsAppMessage();
   const sendMessageViaAPIMutation = useSendWhatsAppMessageViaAPI();
   const updateConfigMutation = useUpdateMetaApiConfig();
@@ -104,39 +139,48 @@ export default function WhatsAppDashboardPage() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages, selectedContact]);
+  }, []);
 
   // Get unique contacts from messages
   const contacts = useMemo(() => {
-    const contactMap = new Map<string, { name: string; lastMessage: string; timestamp: bigint; unread: number }>();
-    
-    messages.forEach((msg) => {
-      const contactNumber = msg.sender === '7709446589' ? msg.recipient : msg.sender;
+    const contactMap = new Map<
+      string,
+      { name: string; lastMessage: string; timestamp: bigint; unread: number }
+    >();
+
+    for (const msg of messages) {
+      const contactNumber =
+        msg.sender === "7709446589" ? msg.recipient : msg.sender;
       const existing = contactMap.get(contactNumber);
-      
+
       if (!existing || msg.timestamp > existing.timestamp) {
         contactMap.set(contactNumber, {
           name: contactNumber,
-          lastMessage: msg.content.substring(0, 50) + (msg.content.length > 50 ? '...' : ''),
+          lastMessage:
+            msg.content.substring(0, 50) +
+            (msg.content.length > 50 ? "..." : ""),
           timestamp: msg.timestamp,
           unread: 0,
         });
       }
-    });
+    }
 
-    return Array.from(contactMap.entries()).map(([number, data]) => ({
-      number,
-      ...data,
-    })).sort((a, b) => Number(b.timestamp - a.timestamp));
+    return Array.from(contactMap.entries())
+      .map(([number, data]) => ({
+        number,
+        ...data,
+      }))
+      .sort((a, b) => Number(b.timestamp - a.timestamp));
   }, [messages]);
 
   // Filter contacts based on search
   const filteredContacts = useMemo(() => {
     if (!searchTerm) return contacts;
     const term = searchTerm.toLowerCase();
-    return contacts.filter((contact) => 
-      contact.number.toLowerCase().includes(term) ||
-      contact.lastMessage.toLowerCase().includes(term)
+    return contacts.filter(
+      (contact) =>
+        contact.number.toLowerCase().includes(term) ||
+        contact.lastMessage.toLowerCase().includes(term),
     );
   }, [contacts, searchTerm]);
 
@@ -144,22 +188,25 @@ export default function WhatsAppDashboardPage() {
   const selectedMessages = useMemo(() => {
     if (!selectedContact) return [];
     return messages
-      .filter((msg) => msg.sender === selectedContact || msg.recipient === selectedContact)
+      .filter(
+        (msg) =>
+          msg.sender === selectedContact || msg.recipient === selectedContact,
+      )
       .sort((a, b) => Number(a.timestamp - b.timestamp));
   }, [messages, selectedContact]);
 
   // Check if selected contact is approved
   const isSelectedContactApproved = useMemo(() => {
     if (!selectedContact) return false;
-    return approvedRecipients.some(r => r.phoneNumber === selectedContact);
+    return approvedRecipients.some((r) => r.phoneNumber === selectedContact);
   }, [selectedContact, approvedRecipients]);
 
   // Format timestamp
   const formatTime = (timestamp: bigint) => {
     const date = new Date(Number(timestamp) / 1000000);
-    return date.toLocaleTimeString('en-IN', {
-      hour: '2-digit',
-      minute: '2-digit',
+    return date.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -170,16 +217,16 @@ export default function WhatsAppDashboardPage() {
     yesterday.setDate(yesterday.getDate() - 1);
 
     if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('en-IN', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      });
+      return "Today";
     }
+    if (date.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    }
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   // Get status icon
@@ -204,15 +251,15 @@ export default function WhatsAppDashboardPage() {
 
     try {
       await sendMessageMutation.mutateAsync({
-        sender: '7709446589',
+        sender: "7709446589",
         recipient: selectedContact,
         content: messageContent.trim(),
       });
-      setMessageContent('');
-      toast.success('Message sent successfully');
+      setMessageContent("");
+      toast.success("Message sent successfully");
     } catch (error) {
-      toast.error('Failed to send message');
-      console.error('Send message error:', error);
+      toast.error("Failed to send message");
+      console.error("Send message error:", error);
     }
   };
 
@@ -222,33 +269,40 @@ export default function WhatsAppDashboardPage() {
 
     // Check if recipient is approved
     if (!isSelectedContactApproved) {
-      toast.error('Recipient not approved. Please add this number to the approved recipients list first.');
+      toast.error(
+        "Recipient not approved. Please add this number to the approved recipients list first.",
+      );
       return;
     }
 
     try {
       await sendMessageViaAPIMutation.mutateAsync({
-        from: '7709446589',
+        from: "7709446589",
         to: selectedContact,
         content: messageContent.trim(),
       });
-      setMessageContent('');
-      toast.success('Message sent via Meta API');
+      setMessageContent("");
+      toast.success("Message sent via Meta API");
     } catch (error: any) {
-      const errorMessage = error?.message || 'Failed to send message via API';
-      if (errorMessage.includes('whitelisted') || errorMessage.includes('approved')) {
-        toast.error('Recipient not approved. Please add this number to the approved recipients list first.');
+      const errorMessage = error?.message || "Failed to send message via API";
+      if (
+        errorMessage.includes("whitelisted") ||
+        errorMessage.includes("approved")
+      ) {
+        toast.error(
+          "Recipient not approved. Please add this number to the approved recipients list first.",
+        );
       } else {
         toast.error(errorMessage);
       }
-      console.error('Send via API error:', error);
+      console.error("Send via API error:", error);
     }
   };
 
   // Handle save settings
   const handleSaveSettings = async () => {
     if (!accessToken || !businessAccountId || !phoneNumberId) {
-      toast.error('All fields are required');
+      toast.error("All fields are required");
       return;
     }
 
@@ -258,43 +312,45 @@ export default function WhatsAppDashboardPage() {
         whatsappBusinessAccountId: businessAccountId,
         phoneNumberId,
       });
-      toast.success('Settings saved successfully');
+      toast.success("Settings saved successfully");
       setSettingsOpen(false);
     } catch (error) {
-      toast.error('Failed to save settings');
-      console.error('Save settings error:', error);
+      toast.error("Failed to save settings");
+      console.error("Save settings error:", error);
     }
   };
 
   // Handle add approved recipient
   const handleAddApprovedRecipient = async () => {
     if (!newRecipientPhone.trim()) {
-      toast.error('Phone number is required');
+      toast.error("Phone number is required");
       return;
     }
 
     // Check if already exists
-    if (approvedRecipients.some(r => r.phoneNumber === newRecipientPhone.trim())) {
-      toast.error('This phone number is already approved');
+    if (
+      approvedRecipients.some((r) => r.phoneNumber === newRecipientPhone.trim())
+    ) {
+      toast.error("This phone number is already approved");
       return;
     }
 
     try {
       await addApprovedRecipientMutation.mutateAsync({
         phoneNumber: newRecipientPhone.trim(),
-        partnerId: 'admin',
-        sourceSystem: 'PB Partners',
+        partnerId: "admin",
+        sourceSystem: "PB Partners",
         recipientType: newRecipientType,
-        description: newRecipientDescription.trim() || 'Approved recipient',
+        description: newRecipientDescription.trim() || "Approved recipient",
       });
-      toast.success('Recipient approved successfully');
-      setNewRecipientPhone('');
-      setNewRecipientDescription('');
+      toast.success("Recipient approved successfully");
+      setNewRecipientPhone("");
+      setNewRecipientDescription("");
       setNewRecipientType(RecipientType.individual);
     } catch (error: any) {
-      const errorMessage = error?.message || 'Failed to approve recipient';
+      const errorMessage = error?.message || "Failed to approve recipient";
       toast.error(errorMessage);
-      console.error('Add approved recipient error:', error);
+      console.error("Add approved recipient error:", error);
     }
   };
 
@@ -302,11 +358,11 @@ export default function WhatsAppDashboardPage() {
   const handleRemoveApprovedRecipient = async (phoneNumber: string) => {
     try {
       await removeApprovedRecipientMutation.mutateAsync(phoneNumber);
-      toast.success('Recipient removed from approved list');
+      toast.success("Recipient removed from approved list");
     } catch (error: any) {
-      const errorMessage = error?.message || 'Failed to remove recipient';
+      const errorMessage = error?.message || "Failed to remove recipient";
       toast.error(errorMessage);
-      console.error('Remove approved recipient error:', error);
+      console.error("Remove approved recipient error:", error);
     }
   };
 
@@ -319,8 +375,12 @@ export default function WhatsAppDashboardPage() {
   // Calculate statistics
   const stats = useMemo(() => {
     const totalMessages = messages.length;
-    const sentMessages = messages.filter(m => m.sender === '7709446589').length;
-    const receivedMessages = messages.filter(m => m.recipient === '7709446589').length;
+    const sentMessages = messages.filter(
+      (m) => m.sender === "7709446589",
+    ).length;
+    const receivedMessages = messages.filter(
+      (m) => m.recipient === "7709446589",
+    ).length;
     const uniqueContacts = contacts.length;
 
     return {
@@ -332,8 +392,8 @@ export default function WhatsAppDashboardPage() {
   }, [messages, contacts]);
 
   // Determine connection status
-  const isConnected = integrationStatus === 'Connected';
-  const isTokenValid = tokenStatus === 'Valid';
+  const isConnected = integrationStatus === "Connected";
+  const isTokenValid = tokenStatus === "Valid";
   const hasPhoneNumber = phoneNumberStatus?.hasAnyNumberAttached ?? false;
 
   // Show login prompt if not authenticated
@@ -353,17 +413,18 @@ export default function WhatsAppDashboardPage() {
               </div>
               <CardTitle className="text-2xl">Admin Access Required</CardTitle>
               <CardDescription>
-                Please log in with your admin credentials to access the WhatsApp dashboard.
+                Please log in with your admin credentials to access the WhatsApp
+                dashboard.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button
                 onClick={login}
-                disabled={loginStatus === 'logging-in'}
+                disabled={loginStatus === "logging-in"}
                 size="lg"
                 className="w-full"
               >
-                {loginStatus === 'logging-in' ? (
+                {loginStatus === "logging-in" ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Logging in...
@@ -418,8 +479,8 @@ export default function WhatsAppDashboardPage() {
               </div>
               <CardTitle className="text-2xl">Access Denied</CardTitle>
               <CardDescription>
-                You do not have permission to access this page. Please contact the administrator if
-                you believe this is an error.
+                You do not have permission to access this page. Please contact
+                the administrator if you believe this is an error.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -474,7 +535,9 @@ export default function WhatsAppDashboardPage() {
                   disabled={healthLoading}
                   title="Refresh deployment status"
                 >
-                  <RefreshCw className={`h-4 w-4 ${healthLoading ? 'animate-spin' : ''}`} />
+                  <RefreshCw
+                    className={`h-4 w-4 ${healthLoading ? "animate-spin" : ""}`}
+                  />
                 </Button>
               </div>
               <CardDescription>
@@ -485,7 +548,9 @@ export default function WhatsAppDashboardPage() {
               {healthLoading ? (
                 <div className="flex items-center gap-3 p-4 border rounded-lg">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Checking backend status...</span>
+                  <span className="text-sm text-muted-foreground">
+                    Checking backend status...
+                  </span>
                 </div>
               ) : healthError ? (
                 <Alert variant="destructive">
@@ -493,10 +558,15 @@ export default function WhatsAppDashboardPage() {
                   <AlertTitle>Health Check Failed</AlertTitle>
                   <AlertDescription className="space-y-2">
                     <p className="text-sm">
-                      Unable to reach the backend health endpoint. The deployment may be in progress or the endpoint is unavailable.
+                      Unable to reach the backend health endpoint. The
+                      deployment may be in progress or the endpoint is
+                      unavailable.
                     </p>
                     <p className="text-xs text-muted-foreground mt-2">
-                      Error: {healthError instanceof Error ? healthError.message : 'Unknown error'}
+                      Error:{" "}
+                      {healthError instanceof Error
+                        ? healthError.message
+                        : "Unknown error"}
                     </p>
                     <Button
                       variant="outline"
@@ -519,23 +589,37 @@ export default function WhatsAppDashboardPage() {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Version</p>
+                          <p className="text-xs text-muted-foreground mb-1">
+                            Version
+                          </p>
                           <Badge variant="outline" className="font-mono">
                             {backendHealth.version}
                           </Badge>
                         </div>
                         <div>
-                          <p className="text-xs text-muted-foreground mb-1">Deployed</p>
+                          <p className="text-xs text-muted-foreground mb-1">
+                            Deployed
+                          </p>
                           <Badge variant="secondary" className="font-mono">
                             {backendHealth.timestamp}
                           </Badge>
                         </div>
                       </div>
                       <div className="mt-3">
-                        <p className="text-xs text-muted-foreground mb-1">Status</p>
-                        <Badge 
-                          variant={backendHealth.status.toLowerCase() === 'ok' ? 'outline' : 'destructive'}
-                          className={backendHealth.status.toLowerCase() === 'ok' ? 'border-green-500 text-green-600' : ''}
+                        <p className="text-xs text-muted-foreground mb-1">
+                          Status
+                        </p>
+                        <Badge
+                          variant={
+                            backendHealth.status.toLowerCase() === "ok"
+                              ? "outline"
+                              : "destructive"
+                          }
+                          className={
+                            backendHealth.status.toLowerCase() === "ok"
+                              ? "border-green-500 text-green-600"
+                              : ""
+                          }
                         >
                           {backendHealth.status}
                         </Badge>
@@ -543,7 +627,8 @@ export default function WhatsAppDashboardPage() {
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Last checked: {new Date().toLocaleTimeString('en-IN')} • Auto-refreshes every 60 seconds
+                    Last checked: {new Date().toLocaleTimeString("en-IN")} •
+                    Auto-refreshes every 60 seconds
                   </p>
                 </div>
               ) : null}
@@ -562,7 +647,10 @@ export default function WhatsAppDashboardPage() {
                   <UserCheck className="h-5 w-5" />
                   <CardTitle>Approved Recipients</CardTitle>
                 </div>
-                <Dialog open={approvedRecipientsOpen} onOpenChange={setApprovedRecipientsOpen}>
+                <Dialog
+                  open={approvedRecipientsOpen}
+                  onOpenChange={setApprovedRecipientsOpen}
+                >
                   <DialogTrigger asChild>
                     <Button variant="outline" size="sm">
                       <Plus className="h-4 w-4 mr-2" />
@@ -573,7 +661,8 @@ export default function WhatsAppDashboardPage() {
                     <DialogHeader>
                       <DialogTitle>Add Approved Recipient</DialogTitle>
                       <DialogDescription>
-                        Add a phone number to the approved recipients list to enable Meta API messaging.
+                        Add a phone number to the approved recipients list to
+                        enable Meta API messaging.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="space-y-4 py-4">
@@ -593,27 +682,43 @@ export default function WhatsAppDashboardPage() {
                         <Label htmlFor="recipientType">Recipient Type</Label>
                         <Select
                           value={newRecipientType}
-                          onValueChange={(value) => setNewRecipientType(value as RecipientType)}
+                          onValueChange={(value) =>
+                            setNewRecipientType(value as RecipientType)
+                          }
                         >
                           <SelectTrigger id="recipientType">
                             <SelectValue />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value={RecipientType.individual}>Individual</SelectItem>
-                            <SelectItem value={RecipientType.corporateClient}>Corporate Client</SelectItem>
-                            <SelectItem value={RecipientType.teamMember}>Team Member</SelectItem>
-                            <SelectItem value={RecipientType.representative}>Representative</SelectItem>
-                            <SelectItem value={RecipientType.automatedSystem}>Automated System</SelectItem>
+                            <SelectItem value={RecipientType.individual}>
+                              Individual
+                            </SelectItem>
+                            <SelectItem value={RecipientType.corporateClient}>
+                              Corporate Client
+                            </SelectItem>
+                            <SelectItem value={RecipientType.teamMember}>
+                              Team Member
+                            </SelectItem>
+                            <SelectItem value={RecipientType.representative}>
+                              Representative
+                            </SelectItem>
+                            <SelectItem value={RecipientType.automatedSystem}>
+                              Automated System
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="recipientDescription">Description (Optional)</Label>
+                        <Label htmlFor="recipientDescription">
+                          Description (Optional)
+                        </Label>
                         <Input
                           id="recipientDescription"
                           placeholder="e.g., Admin's WhatsApp number"
                           value={newRecipientDescription}
-                          onChange={(e) => setNewRecipientDescription(e.target.value)}
+                          onChange={(e) =>
+                            setNewRecipientDescription(e.target.value)
+                          }
                         />
                       </div>
                     </div>
@@ -622,8 +727,8 @@ export default function WhatsAppDashboardPage() {
                         variant="outline"
                         onClick={() => {
                           setApprovedRecipientsOpen(false);
-                          setNewRecipientPhone('');
-                          setNewRecipientDescription('');
+                          setNewRecipientPhone("");
+                          setNewRecipientDescription("");
                           setNewRecipientType(RecipientType.individual);
                         }}
                       >
@@ -639,7 +744,7 @@ export default function WhatsAppDashboardPage() {
                             Adding...
                           </>
                         ) : (
-                          'Add Recipient'
+                          "Add Recipient"
                         )}
                       </Button>
                     </DialogFooter>
@@ -654,14 +759,17 @@ export default function WhatsAppDashboardPage() {
               {approvedRecipientsLoading ? (
                 <div className="flex items-center gap-3 p-4 border rounded-lg">
                   <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">Loading approved recipients...</span>
+                  <span className="text-sm text-muted-foreground">
+                    Loading approved recipients...
+                  </span>
                 </div>
               ) : approvedRecipients.length === 0 ? (
                 <Alert>
                   <Info className="h-4 w-4" />
                   <AlertTitle>No Approved Recipients</AlertTitle>
                   <AlertDescription>
-                    Add phone numbers to the approved list to enable Meta API messaging. Click "Add Recipient" to get started.
+                    Add phone numbers to the approved list to enable Meta API
+                    messaging. Click "Add Recipient" to get started.
                   </AlertDescription>
                 </Alert>
               ) : (
@@ -673,17 +781,23 @@ export default function WhatsAppDashboardPage() {
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="font-medium">{recipient.phoneNumber}</span>
+                          <span className="font-medium">
+                            {recipient.phoneNumber}
+                          </span>
                           <Badge variant="outline" className="text-xs">
                             {recipient.recipientType}
                           </Badge>
                         </div>
-                        <p className="text-sm text-muted-foreground">{recipient.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {recipient.description}
+                        </p>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleRemoveApprovedRecipient(recipient.phoneNumber)}
+                        onClick={() =>
+                          handleRemoveApprovedRecipient(recipient.phoneNumber)
+                        }
                         disabled={removeApprovedRecipientMutation.isPending}
                         title="Remove from approved list"
                       >
@@ -724,7 +838,8 @@ export default function WhatsAppDashboardPage() {
                     <span className="font-medium">Callback URL</span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Use this URL in your Meta Developer Console webhook configuration
+                    Use this URL in your Meta Developer Console webhook
+                    configuration
                   </p>
                   <code className="text-xs bg-muted px-2 py-1 rounded">
                     https://pbpartnershub.in/api/webhook
@@ -733,7 +848,12 @@ export default function WhatsAppDashboardPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => copyToClipboard('https://pbpartnershub.in/api/webhook', 'Callback URL')}
+                  onClick={() =>
+                    copyToClipboard(
+                      "https://pbpartnershub.in/api/webhook",
+                      "Callback URL",
+                    )
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -747,7 +867,8 @@ export default function WhatsAppDashboardPage() {
                     <span className="font-medium">Verify Token</span>
                   </div>
                   <p className="text-sm text-muted-foreground mb-2">
-                    Enter this token in the Meta Developer Console webhook verification field
+                    Enter this token in the Meta Developer Console webhook
+                    verification field
                   </p>
                   <code className="text-xs bg-muted px-2 py-1 rounded">
                     pbpartnershub
@@ -756,7 +877,9 @@ export default function WhatsAppDashboardPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => copyToClipboard('pbpartnershub', 'Verify Token')}
+                  onClick={() =>
+                    copyToClipboard("pbpartnershub", "Verify Token")
+                  }
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -774,7 +897,10 @@ export default function WhatsAppDashboardPage() {
                   {phoneNumberStatusLoading ? (
                     <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                   ) : hasPhoneNumber ? (
-                    <Badge variant="outline" className="border-green-500 text-green-600">
+                    <Badge
+                      variant="outline"
+                      className="border-green-500 text-green-600"
+                    >
                       <CheckCircle2 className="h-3 w-3 mr-1" />
                       Ready
                     </Badge>
@@ -794,42 +920,73 @@ export default function WhatsAppDashboardPage() {
                   <>
                     <div className="grid grid-cols-3 gap-4 mb-3">
                       <div className="text-center p-2 bg-muted rounded">
-                        <div className="text-2xl font-bold">{Number(phoneNumberStatus.totalNumbers)}</div>
-                        <div className="text-xs text-muted-foreground">Total</div>
+                        <div className="text-2xl font-bold">
+                          {Number(phoneNumberStatus.totalNumbers)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Total
+                        </div>
                       </div>
                       <div className="text-center p-2 bg-muted rounded">
-                        <div className="text-2xl font-bold">{Number(phoneNumberStatus.productionNumbers)}</div>
-                        <div className="text-xs text-muted-foreground">Production</div>
+                        <div className="text-2xl font-bold">
+                          {Number(phoneNumberStatus.productionNumbers)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Production
+                        </div>
                       </div>
                       <div className="text-center p-2 bg-muted rounded">
-                        <div className="text-2xl font-bold">{Number(phoneNumberStatus.testNumbers)}</div>
-                        <div className="text-xs text-muted-foreground">Test</div>
+                        <div className="text-2xl font-bold">
+                          {Number(phoneNumberStatus.testNumbers)}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          Test
+                        </div>
                       </div>
                     </div>
 
                     {!hasPhoneNumber ? (
                       <Alert variant="destructive">
                         <AlertTriangle className="h-4 w-4" />
-                        <AlertTitle>Action Required: Attach a Phone Number</AlertTitle>
+                        <AlertTitle>
+                          Action Required: Attach a Phone Number
+                        </AlertTitle>
                         <AlertDescription className="space-y-2 mt-2">
                           <p className="text-sm">
-                            Your webhook verification will remain pending until you attach at least one phone number to your WhatsApp Business Account.
+                            Your webhook verification will remain pending until
+                            you attach at least one phone number to your
+                            WhatsApp Business Account.
                           </p>
                           <div className="text-sm space-y-1 mt-3">
-                            <p className="font-medium">Steps to attach a phone number:</p>
+                            <p className="font-medium">
+                              Steps to attach a phone number:
+                            </p>
                             <ol className="list-decimal list-inside space-y-1 ml-2">
-                              <li>Go to Meta Developer Console → WhatsApp → Configuration</li>
+                              <li>
+                                Go to Meta Developer Console → WhatsApp →
+                                Configuration
+                              </li>
                               <li>Click "Manage phone numbers"</li>
-                              <li>Add a test number (fastest) or production number</li>
+                              <li>
+                                Add a test number (fastest) or production number
+                              </li>
                               <li>Complete OTP verification for the number</li>
-                              <li>Return to Webhook section and click "Verify and Save"</li>
+                              <li>
+                                Return to Webhook section and click "Verify and
+                                Save"
+                              </li>
                             </ol>
                           </div>
                           <Button
                             variant="outline"
                             size="sm"
                             className="mt-3"
-                            onClick={() => window.open('https://developers.facebook.com/apps', '_blank')}
+                            onClick={() =>
+                              window.open(
+                                "https://developers.facebook.com/apps",
+                                "_blank",
+                              )
+                            }
                           >
                             <ExternalLink className="h-3 w-3 mr-2" />
                             Open Meta Developer Console
@@ -839,10 +996,14 @@ export default function WhatsAppDashboardPage() {
                     ) : (
                       <Alert className="border-green-500/50 bg-green-500/10">
                         <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        <AlertTitle className="text-green-600">Phone Number Attached</AlertTitle>
+                        <AlertTitle className="text-green-600">
+                          Phone Number Attached
+                        </AlertTitle>
                         <AlertDescription className="text-green-600/80">
-                          Your WhatsApp Business Account has {Number(phoneNumberStatus.totalNumbers)} phone number(s) attached. 
-                          You can now verify your webhook in the Meta Developer Console.
+                          Your WhatsApp Business Account has{" "}
+                          {Number(phoneNumberStatus.totalNumbers)} phone
+                          number(s) attached. You can now verify your webhook in
+                          the Meta Developer Console.
                         </AlertDescription>
                       </Alert>
                     )}
@@ -851,7 +1012,8 @@ export default function WhatsAppDashboardPage() {
                   <Alert>
                     <Info className="h-4 w-4" />
                     <AlertDescription>
-                      Unable to fetch phone number status. Please check your Meta API credentials.
+                      Unable to fetch phone number status. Please check your
+                      Meta API credentials.
                     </AlertDescription>
                   </Alert>
                 )}
@@ -877,7 +1039,8 @@ export default function WhatsAppDashboardPage() {
               <WifiOff className="h-4 w-4" />
               <AlertTitle>Not Connected</AlertTitle>
               <AlertDescription>
-                WhatsApp API is not connected. Please configure your Meta Business API credentials in settings.
+                WhatsApp API is not connected. Please configure your Meta
+                Business API credentials in settings.
               </AlertDescription>
             </Alert>
           ) : !isTokenValid ? (
@@ -885,7 +1048,8 @@ export default function WhatsAppDashboardPage() {
               <AlertTriangle className="h-4 w-4" />
               <AlertTitle>Token Expired</AlertTitle>
               <AlertDescription>
-                Your Meta API access token has expired. Please update your credentials in settings to continue sending messages.
+                Your Meta API access token has expired. Please update your
+                credentials in settings to continue sending messages.
               </AlertDescription>
             </Alert>
           ) : (
@@ -893,7 +1057,8 @@ export default function WhatsAppDashboardPage() {
               <CheckCircle2 className="h-4 w-4 text-green-600" />
               <AlertTitle className="text-green-600">Connected</AlertTitle>
               <AlertDescription className="text-green-600/80">
-                WhatsApp API is connected and ready to send messages. Token is valid.
+                WhatsApp API is connected and ready to send messages. Token is
+                valid.
               </AlertDescription>
             </Alert>
           )}
@@ -906,37 +1071,53 @@ export default function WhatsAppDashboardPage() {
           <div className="grid gap-6 md:grid-cols-4">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Messages</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Messages
+                </CardTitle>
                 <MessageSquare className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.totalMessages}</div>
-                <p className="text-xs text-muted-foreground">All conversations</p>
+                <p className="text-xs text-muted-foreground">
+                  All conversations
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Sent Messages</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Sent Messages
+                </CardTitle>
                 <Send className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.sentMessages}</div>
-                <p className="text-xs text-muted-foreground">Outgoing messages</p>
+                <p className="text-xs text-muted-foreground">
+                  Outgoing messages
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Received Messages</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Received Messages
+                </CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{stats.receivedMessages}</div>
-                <p className="text-xs text-muted-foreground">Incoming messages</p>
+                <div className="text-2xl font-bold">
+                  {stats.receivedMessages}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Incoming messages
+                </p>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">API Status</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  API Status
+                </CardTitle>
                 {isConnected && isTokenValid ? (
                   <Wifi className="h-4 w-4 text-green-600" />
                 ) : (
@@ -946,13 +1127,20 @@ export default function WhatsAppDashboardPage() {
               <CardContent>
                 <div className="text-2xl font-bold">
                   {isConnected && isTokenValid ? (
-                    <Badge variant="outline" className="border-green-500 text-green-600">Connected</Badge>
+                    <Badge
+                      variant="outline"
+                      className="border-green-500 text-green-600"
+                    >
+                      Connected
+                    </Badge>
                   ) : (
                     <Badge variant="destructive">Disconnected</Badge>
                   )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {isConnected && isTokenValid ? 'Ready to send' : 'Check settings'}
+                  {isConnected && isTokenValid
+                    ? "Ready to send"
+                    : "Check settings"}
                 </p>
               </CardContent>
             </Card>
@@ -979,10 +1167,11 @@ export default function WhatsAppDashboardPage() {
                       <DialogHeader>
                         <DialogTitle>WhatsApp API Settings</DialogTitle>
                         <DialogDescription>
-                          Configure your Meta Business API credentials for WhatsApp integration.
+                          Configure your Meta Business API credentials for
+                          WhatsApp integration.
                         </DialogDescription>
                       </DialogHeader>
-                      
+
                       {/* Current Configuration Info */}
                       {!configLoading && metaApiConfig && (
                         <Alert>
@@ -990,17 +1179,26 @@ export default function WhatsAppDashboardPage() {
                           <AlertTitle>Current Configuration</AlertTitle>
                           <AlertDescription className="space-y-1 mt-2">
                             <div className="text-sm">
-                              <span className="font-medium">Business Account ID:</span>{' '}
+                              <span className="font-medium">
+                                Business Account ID:
+                              </span>{" "}
                               {metaApiConfig.whatsappBusinessAccountId}
                             </div>
                             <div className="text-sm">
-                              <span className="font-medium">Phone Number ID:</span>{' '}
+                              <span className="font-medium">
+                                Phone Number ID:
+                              </span>{" "}
                               {metaApiConfig.phoneNumberId}
                             </div>
                             <div className="text-sm">
-                              <span className="font-medium">Token Status:</span>{' '}
-                              <Badge variant={isTokenValid ? 'outline' : 'destructive'} className="ml-1">
-                                {tokenStatus || 'Unknown'}
+                              <span className="font-medium">Token Status:</span>{" "}
+                              <Badge
+                                variant={
+                                  isTokenValid ? "outline" : "destructive"
+                                }
+                                className="ml-1"
+                              >
+                                {tokenStatus || "Unknown"}
                               </Badge>
                             </div>
                           </AlertDescription>
@@ -1009,7 +1207,9 @@ export default function WhatsAppDashboardPage() {
 
                       <div className="space-y-4 py-4">
                         <div className="space-y-2">
-                          <Label htmlFor="accessToken">Meta API Access Token</Label>
+                          <Label htmlFor="accessToken">
+                            Meta API Access Token
+                          </Label>
                           <Input
                             id="accessToken"
                             type="password"
@@ -1022,12 +1222,16 @@ export default function WhatsAppDashboardPage() {
                           </p>
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="businessAccountId">WhatsApp Business Account ID</Label>
+                          <Label htmlFor="businessAccountId">
+                            WhatsApp Business Account ID
+                          </Label>
                           <Input
                             id="businessAccountId"
                             placeholder="Enter your WhatsApp Business Account ID"
                             value={businessAccountId}
-                            onChange={(e) => setBusinessAccountId(e.target.value)}
+                            onChange={(e) =>
+                              setBusinessAccountId(e.target.value)
+                            }
                           />
                           <p className="text-xs text-muted-foreground">
                             Found in your Meta Business Suite settings
@@ -1063,7 +1267,7 @@ export default function WhatsAppDashboardPage() {
                               Saving...
                             </>
                           ) : (
-                            'Save Settings'
+                            "Save Settings"
                           )}
                         </Button>
                       </DialogFooter>
@@ -1090,23 +1294,28 @@ export default function WhatsAppDashboardPage() {
                     <div className="text-center py-12 px-4">
                       <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                       <p className="text-sm text-muted-foreground">
-                        {searchTerm ? 'No contacts found' : 'No conversations yet'}
+                        {searchTerm
+                          ? "No contacts found"
+                          : "No conversations yet"}
                       </p>
                     </div>
                   ) : (
                     <div className="space-y-1 p-2">
                       {filteredContacts.map((contact) => (
                         <button
+                          type="button"
                           key={contact.number}
                           onClick={() => setSelectedContact(contact.number)}
                           className={`w-full text-left p-3 rounded-lg transition-colors ${
                             selectedContact === contact.number
-                              ? 'bg-primary/10 border border-primary/20'
-                              : 'hover:bg-muted'
+                              ? "bg-primary/10 border border-primary/20"
+                              : "hover:bg-muted"
                           }`}
                         >
                           <div className="flex items-start justify-between mb-1">
-                            <span className="font-medium text-sm">{contact.name}</span>
+                            <span className="font-medium text-sm">
+                              {contact.name}
+                            </span>
                             <span className="text-xs text-muted-foreground">
                               {formatTime(contact.timestamp)}
                             </span>
@@ -1132,7 +1341,10 @@ export default function WhatsAppDashboardPage() {
                         <CardTitle className="text-xl flex items-center gap-2">
                           {selectedContact}
                           {isSelectedContactApproved && (
-                            <Badge variant="outline" className="border-green-500 text-green-600">
+                            <Badge
+                              variant="outline"
+                              className="border-green-500 text-green-600"
+                            >
                               <CheckCircle2 className="h-3 w-3 mr-1" />
                               Approved
                             </Badge>
@@ -1155,28 +1367,38 @@ export default function WhatsAppDashboardPage() {
                       ) : (
                         <div className="space-y-4">
                           {selectedMessages.map((msg, index) => {
-                            const isOutgoing = msg.sender === '7709446589';
-                            const showDate = index === 0 || 
-                              formatDate(selectedMessages[index - 1].timestamp) !== formatDate(msg.timestamp);
+                            const isOutgoing = msg.sender === "7709446589";
+                            const showDate =
+                              index === 0 ||
+                              formatDate(
+                                selectedMessages[index - 1].timestamp,
+                              ) !== formatDate(msg.timestamp);
 
                             return (
                               <div key={msg.id}>
                                 {showDate && (
                                   <div className="flex items-center justify-center my-4">
-                                    <Badge variant="secondary" className="text-xs">
+                                    <Badge
+                                      variant="secondary"
+                                      className="text-xs"
+                                    >
                                       {formatDate(msg.timestamp)}
                                     </Badge>
                                   </div>
                                 )}
-                                <div className={`flex ${isOutgoing ? 'justify-end' : 'justify-start'}`}>
+                                <div
+                                  className={`flex ${isOutgoing ? "justify-end" : "justify-start"}`}
+                                >
                                   <div
                                     className={`max-w-[70%] rounded-lg px-4 py-2 ${
                                       isOutgoing
-                                        ? 'bg-primary text-primary-foreground'
-                                        : 'bg-muted'
+                                        ? "bg-primary text-primary-foreground"
+                                        : "bg-muted"
                                     }`}
                                   >
-                                    <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                                    <p className="text-sm whitespace-pre-wrap break-words">
+                                      {msg.content}
+                                    </p>
                                     <div className="flex items-center justify-end gap-1 mt-1">
                                       <span className="text-xs opacity-70">
                                         {formatTime(msg.timestamp)}
@@ -1202,8 +1424,9 @@ export default function WhatsAppDashboardPage() {
                           <AlertTriangle className="h-4 w-4" />
                           <AlertTitle>Recipient Not Approved</AlertTitle>
                           <AlertDescription>
-                            This phone number is not in the approved recipients list. Meta API messaging is disabled. 
-                            Please add this number to the approved list to enable sending.
+                            This phone number is not in the approved recipients
+                            list. Meta API messaging is disabled. Please add
+                            this number to the approved list to enable sending.
                           </AlertDescription>
                         </Alert>
                       )}
@@ -1213,7 +1436,7 @@ export default function WhatsAppDashboardPage() {
                           value={messageContent}
                           onChange={(e) => setMessageContent(e.target.value)}
                           onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
+                            if (e.key === "Enter" && !e.shiftKey) {
                               e.preventDefault();
                               handleSendMessage();
                             }
@@ -1223,7 +1446,10 @@ export default function WhatsAppDashboardPage() {
                         <div className="flex flex-col gap-2">
                           <Button
                             onClick={handleSendMessage}
-                            disabled={!messageContent.trim() || sendMessageMutation.isPending}
+                            disabled={
+                              !messageContent.trim() ||
+                              sendMessageMutation.isPending
+                            }
                             size="icon"
                             title="Send message (stored locally)"
                           >
@@ -1235,10 +1461,20 @@ export default function WhatsAppDashboardPage() {
                           </Button>
                           <Button
                             onClick={handleSendViaAPI}
-                            disabled={!messageContent.trim() || sendMessageViaAPIMutation.isPending || !isConnected || !isTokenValid || !isSelectedContactApproved}
+                            disabled={
+                              !messageContent.trim() ||
+                              sendMessageViaAPIMutation.isPending ||
+                              !isConnected ||
+                              !isTokenValid ||
+                              !isSelectedContactApproved
+                            }
                             size="icon"
                             variant="outline"
-                            title={isSelectedContactApproved ? "Send via Meta API" : "Recipient must be approved first"}
+                            title={
+                              isSelectedContactApproved
+                                ? "Send via Meta API"
+                                : "Recipient must be approved first"
+                            }
                           >
                             {sendMessageViaAPIMutation.isPending ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
@@ -1249,7 +1485,8 @@ export default function WhatsAppDashboardPage() {
                         </div>
                       </div>
                       <p className="text-xs text-muted-foreground mt-2">
-                        Press Enter to send, Shift+Enter for new line. Use Meta API button to send via WhatsApp.
+                        Press Enter to send, Shift+Enter for new line. Use Meta
+                        API button to send via WhatsApp.
                       </p>
                     </div>
                   </CardContent>
@@ -1258,7 +1495,9 @@ export default function WhatsAppDashboardPage() {
                 <CardContent className="flex items-center justify-center h-[600px]">
                   <div className="text-center">
                     <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Select a conversation</h3>
+                    <h3 className="text-lg font-semibold mb-2">
+                      Select a conversation
+                    </h3>
                     <p className="text-sm text-muted-foreground">
                       Choose a contact from the list to start messaging
                     </p>

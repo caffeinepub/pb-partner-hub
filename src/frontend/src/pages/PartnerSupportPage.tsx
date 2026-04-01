@@ -1,15 +1,15 @@
-import { Link } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CheckCircle, ArrowRight } from 'lucide-react';
-import SEO from '@/components/SEO';
+import SEO from "@/components/SEO";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Link } from "@tanstack/react-router";
+import { ArrowRight, CheckCircle } from "lucide-react";
 
 const supportPoints = [
-  'Partner onboarding assistance',
-  'Policy issuance & process support',
-  'Documentation guidance',
-  'Claims & service coordination',
-  'Dedicated help for daily partner queries',
+  "Partner onboarding assistance",
+  "Policy issuance & process support",
+  "Documentation guidance",
+  "Claims & service coordination",
+  "Dedicated help for daily partner queries",
 ];
 
 export default function PartnerSupportPage() {
@@ -24,10 +24,13 @@ export default function PartnerSupportPage() {
       <div className="container py-16 md:py-24">
         <div className="max-w-4xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Partner Support</h1>
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
+              Partner Support
+            </h1>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              We provide complete operational and support assistance to insurance partners so they
-              can focus on sales and customer relationships.
+              We provide complete operational and support assistance to
+              insurance partners so they can focus on sales and customer
+              relationships.
             </p>
           </div>
 
@@ -48,7 +51,8 @@ export default function PartnerSupportPage() {
           <div className="text-center space-y-6">
             <h2 className="text-2xl font-bold">Need Support?</h2>
             <p className="text-muted-foreground">
-              Our dedicated support team is here to help you with all your partner needs.
+              Our dedicated support team is here to help you with all your
+              partner needs.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/contact">
@@ -58,7 +62,11 @@ export default function PartnerSupportPage() {
                 </Button>
               </Link>
               <Link to="/partner-onboarding">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
                   Become a Partner
                 </Button>
               </Link>

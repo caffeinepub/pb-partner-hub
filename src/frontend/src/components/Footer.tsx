@@ -1,27 +1,34 @@
-import { Link } from '@tanstack/react-router';
-import { Heart } from 'lucide-react';
-import { BRAND } from '@/constants/brand';
-import HostingerZipDownloadLink from './HostingerZipDownloadLink';
+import { BRAND } from "@/constants/brand";
+import { Link } from "@tanstack/react-router";
+import { Heart } from "lucide-react";
+import HostingerZipDownloadLink from "./HostingerZipDownloadLink";
 
 const footerLinks = {
   company: [
-    { name: 'About Us', href: '/about' },
-    { name: 'Partner Support', href: '/partner-support' },
-    { name: 'Insurance Services', href: '/insurance-services' },
-    { name: 'Contact Us', href: '/contact' },
-    { name: 'Page 2', href: '/page-2' },
-    { name: 'Page 3', href: '/page-3' },
-    { name: 'Page 4', href: '/page-4' },
-    { name: 'Page 5', href: '/page-5' },
+    { name: "About Us", href: "/about" },
+    { name: "Partner Support", href: "/partner-support" },
+    { name: "Insurance Services", href: "/insurance-services" },
+    { name: "Partner Onboarding", href: "/partner-onboarding" },
+    { name: "Contact Us", href: "/contact" },
+    { name: "Page 2", href: "/page-2" },
+    { name: "Page 3", href: "/page-3" },
+    { name: "Page 4", href: "/page-4" },
+    { name: "Page 5", href: "/page-5" },
   ],
   legal: [
-    { name: 'Privacy Policy', href: '/privacy-policy' },
-    { name: 'Terms of Use', href: '/terms-of-use' },
-    { name: 'Disclaimer', href: '/disclaimer' },
+    { name: "Privacy Policy", href: "/privacy-policy" },
+    { name: "Terms of Use", href: "/terms-of-use" },
+    { name: "Disclaimer", href: "/disclaimer" },
   ],
 };
 
 export default function Footer() {
+  const currentYear = new Date().getFullYear();
+  const appIdentifier =
+    typeof window !== "undefined"
+      ? encodeURIComponent(window.location.hostname)
+      : "pbpartnershub";
+
   return (
     <footer className="border-t bg-muted/30">
       <div className="container py-12">
@@ -36,36 +43,53 @@ export default function Footer() {
                 height={BRAND.logo.displaySize.height}
                 className="h-10 w-10"
               />
-              <span className="text-xl font-bold text-primary">{BRAND.name}</span>
+              <span className="text-xl font-bold text-primary">
+                {BRAND.name}
+              </span>
             </div>
             <p className="text-sm text-muted-foreground max-w-md">
-              Supporting PBPartners (Policybazaar Insurance Broker Pvt. Ltd.) by helping insurance
-              partners with onboarding, document support, and business development.
+              Supporting PBPartners (Policybazaar Insurance Broker Pvt. Ltd.) by
+              helping insurance partners with onboarding, document support, and
+              business development.
             </p>
             <div className="mt-4">
-              <p className="text-sm font-semibold text-foreground">Contact Information</p>
+              <p className="text-sm font-semibold text-foreground">
+                Contact Information
+              </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Email:{' '}
-                <a href="mailto:info@pbpartnershub.in" className="hover:text-primary transition-colors">
+                Email:{" "}
+                <a
+                  href="mailto:info@pbpartnershub.in"
+                  className="hover:text-primary transition-colors"
+                >
                   info@pbpartnershub.in
                 </a>
-                ,{' '}
-                <a href="mailto:support@pbpartnershub.in" className="hover:text-primary transition-colors">
+                ,{" "}
+                <a
+                  href="mailto:support@pbpartnershub.in"
+                  className="hover:text-primary transition-colors"
+                >
                   support@pbpartnershub.in
                 </a>
-                ,{' '}
-                <a href="mailto:Prashant.pbp47@gmail.com" className="hover:text-primary transition-colors">
+                ,{" "}
+                <a
+                  href="mailto:Prashant.pbp47@gmail.com"
+                  className="hover:text-primary transition-colors"
+                >
                   Prashant.pbp47@gmail.com
                 </a>
               </p>
               <p className="text-sm text-muted-foreground">
-                Mobile:{' '}
-                <a href="tel:7972584060" className="hover:text-primary transition-colors">
+                Mobile:{" "}
+                <a
+                  href="tel:7972584060"
+                  className="hover:text-primary transition-colors"
+                >
                   7972584060
                 </a>
               </p>
               <p className="text-sm text-muted-foreground">
-                WhatsApp:{' '}
+                WhatsApp:{" "}
                 <a
                   href="https://wa.me/7709446589"
                   target="_blank"
@@ -76,14 +100,17 @@ export default function Footer() {
                 </a>
               </p>
               <p className="text-sm text-muted-foreground mt-2">
-                Address: Flat No 2, Sudarshan Housing Society, Indira Nagar, Nashik, Maharashtra 422009, District Nashik
+                Address: Flat No 2, Sudarshan Housing Society, Indira Nagar,
+                Nashik, Maharashtra 422009, District Nashik
               </p>
             </div>
           </div>
 
           {/* Company Links */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">Company</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">
+              Company
+            </h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
                 <li key={link.name}>
@@ -100,7 +127,9 @@ export default function Footer() {
 
           {/* Legal Links */}
           <div>
-            <h3 className="text-sm font-semibold text-foreground mb-4">Legal</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-4">
+              Legal
+            </h3>
             <ul className="space-y-3">
               {footerLinks.legal.map((link) => (
                 <li key={link.name}>
@@ -123,10 +152,10 @@ export default function Footer() {
 
         <div className="mt-8 pt-8 border-t">
           <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-1 flex-wrap">
-            © 2026. Built with{' '}
-            <Heart className="h-4 w-4 text-red-500 fill-red-500" /> using{' '}
+            © {currentYear}. Built with{" "}
+            <Heart className="h-4 w-4 text-red-500 fill-red-500" /> using{" "}
             <a
-              href="https://caffeine.ai"
+              href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appIdentifier}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary hover:underline"

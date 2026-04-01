@@ -4,10 +4,10 @@
  */
 
 export const BRAND = {
-  name: 'PB Partners Hub',
+  name: "PB Partners Hub",
   logo: {
-    path: '/assets/generated/pb-partners-hub-logo.dim_512x512.png',
-    alt: 'PB Partners Hub',
+    path: "/assets/generated/pb-partners-hub-logo.dim_512x512.png",
+    alt: "PB Partners Hub",
     displaySize: {
       width: 40,
       height: 40,

@@ -1,10 +1,15 @@
-import { MessageCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { WHATSAPP_CONFIG } from '@/constants/whatsapp';
+import { Button } from "@/components/ui/button";
+import { WHATSAPP_CONFIG } from "@/constants/whatsapp";
+import { MessageCircle } from "lucide-react";
 
 export default function WhatsAppFloatingButton() {
   const handleClick = () => {
-    window.open(WHATSAPP_CONFIG.getWhatsAppUrl('Hello! I would like to know more about PB Partners Hub.'), '_blank');
+    window.open(
+      WHATSAPP_CONFIG.getWhatsAppUrl(
+        "Hello! I would like to know more about PB Partners Hub.",
+      ),
+      "_blank",
+    );
   };
 
   return (

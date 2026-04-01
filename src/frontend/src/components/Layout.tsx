@@ -1,8 +1,8 @@
-import { Outlet } from '@tanstack/react-router';
-import Header from './Header';
-import Footer from './Footer';
-import ChatbotWidget from './chatbot/ChatbotWidget';
-import WhatsAppFloatingButton from './WhatsAppFloatingButton';
+import { Outlet } from "@tanstack/react-router";
+import Footer from "./Footer";
+import Header from "./Header";
+import WhatsAppFloatingButton from "./WhatsAppFloatingButton";
+import ChatbotWidget from "./chatbot/ChatbotWidget";
 
 export default function Layout() {
   return (

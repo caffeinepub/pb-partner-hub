@@ -1,7 +1,15 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useActor } from './useActor';
-import type { ContactFormSubmission, DocumentType, WhatsAppMessage, MessagePayload, MetaApiResponse, MetaApiConfig, MetaPhoneNumberStatus } from '../backend';
-import { ExternalBlob } from '../backend';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
+  ContactFormSubmission,
+  DocumentType,
+  MessagePayload,
+  MetaApiConfig,
+  MetaApiResponse,
+  MetaPhoneNumberStatus,
+  WhatsAppMessage,
+} from "../backend";
+import { ExternalBlob } from "../backend";
+import { useActor } from "./useActor";
 
 // Define types for approved recipients (not yet in backend interface)
 export interface RecipientRecord {
@@ -13,11 +21,11 @@ export interface RecipientRecord {
 }
 
 export enum RecipientType {
-  individual = 'individual',
-  corporateClient = 'corporateClient',
-  teamMember = 'teamMember',
-  representative = 'representative',
-  automatedSystem = 'automatedSystem',
+  individual = "individual",
+  corporateClient = "corporateClient",
+  teamMember = "teamMember",
+  representative = "representative",
+  automatedSystem = "automatedSystem",
 }
 
 // Submit contact form
@@ -33,11 +41,17 @@ export function useSubmitContactForm() {
       company: string;
       message: string;
     }) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.submitContactForm(data.name, data.email, data.phone, data.company, data.message);
+      if (!actor) throw new Error("Actor not available");
+      await actor.submitContactForm(
+        data.name,
+        data.email,
+        data.phone,
+        data.company,
+        data.message,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['contactFormSubmissions'] });
+      queryClient.invalidateQueries({ queryKey: ["contactFormSubmissions"] });
     },
   });
 }
@@ -53,14 +67,16 @@ export function useUploadDocument() {
       fileName: string;
       fileContent: Uint8Array;
     }) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       // Cast to Uint8Array<ArrayBuffer> to satisfy type requirements
-      const bytes = new Uint8Array(data.fileContent.buffer.slice(0)) as Uint8Array<ArrayBuffer>;
+      const bytes = new Uint8Array(
+        data.fileContent.buffer.slice(0),
+      ) as Uint8Array<ArrayBuffer>;
       const blob = ExternalBlob.fromBytes(bytes);
       await actor.uploadDocument(data.docType, data.fileName, blob);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['submittedDocuments'] });
+      queryClient.invalidateQueries({ queryKey: ["submittedDocuments"] });
     },
   });
 }
@@ -70,9 +86,9 @@ export function useGetAllContactFormSubmissions() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<ContactFormSubmission[]>({
-    queryKey: ['contactFormSubmissions'],
+    queryKey: ["contactFormSubmissions"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getAllContactFormSubmissions();
     },
     enabled: !!actor && !actorFetching,
@@ -85,7 +101,7 @@ export function useIsCallerAdmin() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<boolean>({
-    queryKey: ['isAdmin'],
+    queryKey: ["isAdmin"],
     queryFn: async () => {
       if (!actor) return false;
       return actor.isCallerAdmin();
@@ -100,9 +116,9 @@ export function useGetAllWhatsAppMessages() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<WhatsAppMessage[]>({
-    queryKey: ['whatsappMessages'],
+    queryKey: ["whatsappMessages"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getAllWhatsAppMessages();
     },
     enabled: !!actor && !actorFetching,
@@ -122,11 +138,15 @@ export function useSendWhatsAppMessage() {
       recipient: string;
       content: string;
     }) => {
-      if (!actor) throw new Error('Actor not available');
-      await actor.sendWhatsAppMessage(data.sender, data.recipient, data.content);
+      if (!actor) throw new Error("Actor not available");
+      await actor.sendWhatsAppMessage(
+        data.sender,
+        data.recipient,
+        data.content,
+      );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['whatsappMessages'] });
+      queryClient.invalidateQueries({ queryKey: ["whatsappMessages"] });
     },
   });
 }
@@ -138,11 +158,11 @@ export function useSendWhatsAppMessageViaAPI() {
 
   return useMutation<MetaApiResponse, Error, MessagePayload>({
     mutationFn: async (payload: MessagePayload) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.sendWhatsAppMessageViaAPI(payload);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['whatsappMessages'] });
+      queryClient.invalidateQueries({ queryKey: ["whatsappMessages"] });
     },
   });
 }
@@ -152,9 +172,9 @@ export function useGetMetaApiConfig() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<MetaApiConfig>({
-    queryKey: ['metaApiConfig'],
+    queryKey: ["metaApiConfig"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getMetaApiConfig();
     },
     enabled: !!actor && !actorFetching,
@@ -169,14 +189,16 @@ export function useUpdateMetaApiConfig() {
 
   return useMutation({
     mutationFn: async (config: MetaApiConfig) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       await actor.updateMetaApiConfig(config);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metaApiConfig'] });
-      queryClient.invalidateQueries({ queryKey: ['whatsappIntegrationStatus'] });
-      queryClient.invalidateQueries({ queryKey: ['whatsappTokenStatus'] });
-      queryClient.invalidateQueries({ queryKey: ['phoneNumberStatus'] });
+      queryClient.invalidateQueries({ queryKey: ["metaApiConfig"] });
+      queryClient.invalidateQueries({
+        queryKey: ["whatsappIntegrationStatus"],
+      });
+      queryClient.invalidateQueries({ queryKey: ["whatsappTokenStatus"] });
+      queryClient.invalidateQueries({ queryKey: ["phoneNumberStatus"] });
     },
   });
 }
@@ -186,9 +208,9 @@ export function useGetWhatsAppIntegrationStatus() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<string>({
-    queryKey: ['whatsappIntegrationStatus'],
+    queryKey: ["whatsappIntegrationStatus"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getWhatsAppIntegrationStatus();
     },
     enabled: !!actor && !actorFetching,
@@ -202,9 +224,9 @@ export function useGetWhatsAppTokenStatus() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<string>({
-    queryKey: ['whatsappTokenStatus'],
+    queryKey: ["whatsappTokenStatus"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getWhatsAppTokenStatus();
     },
     enabled: !!actor && !actorFetching,
@@ -218,9 +240,9 @@ export function useGetWhatsAppAccountDetails() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<MetaApiConfig | null>({
-    queryKey: ['whatsappAccountDetails'],
+    queryKey: ["whatsappAccountDetails"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.getWhatsAppAccountDetails();
     },
     enabled: !!actor && !actorFetching,
@@ -233,9 +255,9 @@ export function useGetPhoneNumberStatus() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<MetaPhoneNumberStatus>({
-    queryKey: ['phoneNumberStatus'],
+    queryKey: ["phoneNumberStatus"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       return actor.hasAtLeastOnePhoneNumberAttached();
     },
     enabled: !!actor && !actorFetching,
@@ -253,24 +275,26 @@ export interface BackendHealth {
 
 export function useGetBackendHealth() {
   return useQuery<BackendHealth>({
-    queryKey: ['backendHealth'],
+    queryKey: ["backendHealth"],
     queryFn: async () => {
-      const response = await fetch('/api/health');
+      const response = await fetch("/api/health");
       if (!response.ok) {
-        throw new Error(`Health check failed: ${response.status} ${response.statusText}`);
+        throw new Error(
+          `Health check failed: ${response.status} ${response.statusText}`,
+        );
       }
       const text = await response.text();
-      
+
       // Parse the plain text response
       // Expected format: "Backend version: X.Y.Z | Deployed: YYYY-MM-DD HH:MM:SS | Status: OK"
       const versionMatch = text.match(/version:\s*([^\|]+)/i);
       const timestampMatch = text.match(/deployed:\s*([^\|]+)/i);
       const statusMatch = text.match(/status:\s*(.+)/i);
-      
+
       return {
-        version: versionMatch ? versionMatch[1].trim() : 'Unknown',
-        timestamp: timestampMatch ? timestampMatch[1].trim() : 'Unknown',
-        status: statusMatch ? statusMatch[1].trim() : 'Unknown',
+        version: versionMatch ? versionMatch[1].trim() : "Unknown",
+        timestamp: timestampMatch ? timestampMatch[1].trim() : "Unknown",
+        status: statusMatch ? statusMatch[1].trim() : "Unknown",
       };
     },
     retry: 2,
@@ -284,21 +308,26 @@ export function useGetApprovedRecipients() {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<RecipientRecord[]>({
-    queryKey: ['approvedRecipients'],
+    queryKey: ["approvedRecipients"],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       // Check if method exists on actor
-      if ('getApprovedRecipients' in actor && typeof (actor as any).getApprovedRecipients === 'function') {
+      if (
+        "getApprovedRecipients" in actor &&
+        typeof (actor as any).getApprovedRecipients === "function"
+      ) {
         return (actor as any).getApprovedRecipients();
       }
       // Return default approved recipient if method not available
-      return [{
-        phoneNumber: '9168761915',
-        partnerId: 'admin',
-        sourceSystem: 'PB Partners',
-        recipientType: RecipientType.individual,
-        description: "Admin's WhatsApp number"
-      }];
+      return [
+        {
+          phoneNumber: "9168761915",
+          partnerId: "admin",
+          sourceSystem: "PB Partners",
+          recipientType: RecipientType.individual,
+          description: "Admin's WhatsApp number",
+        },
+      ];
     },
     enabled: !!actor && !actorFetching,
     retry: false,
@@ -312,16 +341,21 @@ export function useAddApprovedRecipient() {
 
   return useMutation({
     mutationFn: async (record: RecipientRecord) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       // Check if method exists on actor
-      if ('addApprovedRecipient' in actor && typeof (actor as any).addApprovedRecipient === 'function') {
+      if (
+        "addApprovedRecipient" in actor &&
+        typeof (actor as any).addApprovedRecipient === "function"
+      ) {
         await (actor as any).addApprovedRecipient(record);
       } else {
-        throw new Error('Backend method not yet implemented. Please wait for the next deployment.');
+        throw new Error(
+          "Backend method not yet implemented. Please wait for the next deployment.",
+        );
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvedRecipients'] });
+      queryClient.invalidateQueries({ queryKey: ["approvedRecipients"] });
     },
   });
 }
@@ -333,16 +367,21 @@ export function useRemoveApprovedRecipient() {
 
   return useMutation({
     mutationFn: async (phoneNumber: string) => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) throw new Error("Actor not available");
       // Check if method exists on actor
-      if ('removeApprovedRecipient' in actor && typeof (actor as any).removeApprovedRecipient === 'function') {
+      if (
+        "removeApprovedRecipient" in actor &&
+        typeof (actor as any).removeApprovedRecipient === "function"
+      ) {
         await (actor as any).removeApprovedRecipient(phoneNumber);
       } else {
-        throw new Error('Backend method not yet implemented. Please wait for the next deployment.');
+        throw new Error(
+          "Backend method not yet implemented. Please wait for the next deployment.",
+        );
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['approvedRecipients'] });
+      queryClient.invalidateQueries({ queryKey: ["approvedRecipients"] });
     },
   });
 }

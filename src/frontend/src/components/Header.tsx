@@ -1,22 +1,20 @@
-import { Link, useRouterState } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Menu, Shield, MessageCircle } from 'lucide-react';
-import { useState } from 'react';
-import { useIsCallerAdmin } from '@/hooks/useQueries';
-import { useInternetIdentity } from '@/hooks/useInternetIdentity';
-import { BRAND } from '@/constants/brand';
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { BRAND } from "@/constants/brand";
+import { useInternetIdentity } from "@/hooks/useInternetIdentity";
+import { useIsCallerAdmin } from "@/hooks/useQueries";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { Menu, MessageCircle, Shield } from "lucide-react";
+import { useState } from "react";
 
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'About Us', href: '/about' },
-  { name: 'Partner Support', href: '/partner-support' },
-  { name: 'Insurance Services', href: '/insurance-services' },
-  { name: 'Contact Us', href: '/contact' },
-  { name: 'Page 2', href: '/page-2' },
-  { name: 'Page 3', href: '/page-3' },
-  { name: 'Page 4', href: '/page-4' },
-  { name: 'Page 5', href: '/page-5' },
+  { name: "Home", href: "/" },
+  { name: "About Us", href: "/about" },
+  { name: "Partner Support", href: "/partner-support" },
+  { name: "Insurance Services", href: "/insurance-services" },
+  { name: "Partner Onboarding", href: "/partner-onboarding" },
+  { name: "Offline Quote", href: "/offline-quote" },
+  { name: "Contact Us", href: "/contact" },
 ];
 
 export default function Header() {
@@ -47,7 +45,7 @@ export default function Header() {
           {navigation.map((item) => (
             <Link key={item.name} to={item.href}>
               <Button
-                variant={currentPath === item.href ? 'default' : 'ghost'}
+                variant={currentPath === item.href ? "default" : "ghost"}
                 className="text-sm font-medium"
               >
                 {item.name}
@@ -58,7 +56,7 @@ export default function Header() {
             <>
               <Link to="/admin">
                 <Button
-                  variant={currentPath === '/admin' ? 'default' : 'ghost'}
+                  variant={currentPath === "/admin" ? "default" : "ghost"}
                   className="text-sm font-medium"
                 >
                   <Shield className="mr-2 h-4 w-4" />
@@ -67,7 +65,7 @@ export default function Header() {
               </Link>
               <Link to="/whatsapp">
                 <Button
-                  variant={currentPath === '/whatsapp' ? 'default' : 'ghost'}
+                  variant={currentPath === "/whatsapp" ? "default" : "ghost"}
                   className="text-sm font-medium"
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
@@ -89,9 +87,13 @@ export default function Header() {
           <SheetContent side="right" className="w-[300px] sm:w-[400px]">
             <nav className="flex flex-col space-y-4 mt-8">
               {navigation.map((item) => (
-                <Link key={item.name} to={item.href} onClick={() => setIsOpen(false)}>
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  onClick={() => setIsOpen(false)}
+                >
                   <Button
-                    variant={currentPath === item.href ? 'default' : 'ghost'}
+                    variant={currentPath === item.href ? "default" : "ghost"}
                     className="w-full justify-start text-base"
                   >
                     {item.name}
@@ -102,7 +104,7 @@ export default function Header() {
                 <>
                   <Link to="/admin" onClick={() => setIsOpen(false)}>
                     <Button
-                      variant={currentPath === '/admin' ? 'default' : 'ghost'}
+                      variant={currentPath === "/admin" ? "default" : "ghost"}
                       className="w-full justify-start text-base"
                     >
                       <Shield className="mr-2 h-4 w-4" />
@@ -111,7 +113,9 @@ export default function Header() {
                   </Link>
                   <Link to="/whatsapp" onClick={() => setIsOpen(false)}>
                     <Button
-                      variant={currentPath === '/whatsapp' ? 'default' : 'ghost'}
+                      variant={
+                        currentPath === "/whatsapp" ? "default" : "ghost"
+                      }
                       className="w-full justify-start text-base"
                     >
                       <MessageCircle className="mr-2 h-4 w-4" />
